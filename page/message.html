@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-uWxY/CJNBR+1zjPWmfnSnVxwRheevXITnMqoEIeG1LJrdI0GlVs/9cVSyPYXdcSF" crossorigin="anonymous">
+    <link rel="stylesheet" href="../css/estilos.css">
+</head>
+<body>
+    <a href="../index.html" class="btn-atras">Atras</a>
+    <h1 class="text-center mt-2">Formulario MESSAGE</h1>
+    <div class="container-fluid mt-3">
+        <div class="row">
+            <table class="table table-borderless">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Message Text</th>
+                        <th colspan="2">Accion</th>
+                    </tr>
+                </thead>
+                <tbody class="cuerpo" id="contenidoTabla">
+                   
+                </tbody>
+            </table>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-2">
+                <label for="id">ID</label>
+                <input class="form-control form-control-sm" type="number" placeholder="Id" id="id">
+            </div>
+            <div class="col-2">
+                <label for="messagetext">Message Text</label>
+                <input class="form-control form-control-sm" type="text" placeholder="Name" id="messagetext">
+            </div>
+        </div>
+        <br />
+        <div class="d-flex justify-content-start gap-3">
+            <button type="button" class="btn btn-outline-primary" onclick="consultar()"
+                id="btnRecargar">Recargar</button>
+            <button type="button" class="btn btn-outline-success btn-block" onclick="crear()"
+                id="btnCrear">Crear</button>
+            <button type="button" class="btn btn-outline-warning" onclick="actualizar()"
+                id="btnActualizar">Actualizar</button>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-kQtW33rZJAHjgefvhyyzcGF3C5TFyBQBA13V1RKPf4uH+bwyzQxZ6CmMZHmNBEfJ" crossorigin="anonymous"></script>
+    <script src="../js/message.js"></script>
+</body>
+</html>

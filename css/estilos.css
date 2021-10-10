@@ -1,0 +1,30 @@
+body {
+    background-color: #002742;
+    color:#fff;
+}
+
+.btn-atras {
+    position: absolute;
+    top: 10px;
+    left: 15px;
+    color: #fff;
+    font-size: large;
+}
+
+.btn-atras:hover {
+    color: orange;
+}
+
+.container-fluid {
+    width: 90%;
+}
+
+table, th, td {
+    border: 1px solid #fff;
+    border-collapse: collapse;
+    color:#fff;
+}
+
+th, td {
+    text-align: center;
+}
