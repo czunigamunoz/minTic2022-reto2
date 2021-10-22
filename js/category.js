@@ -1,19 +1,19 @@
 const DATAREQUEST = {
-  url: "http://localhost:8080/api/Message",
-  dataType: "json",
-  contentType: "application/json; charset=utf-8",
-};
+  'url': 'http://localhost:8080/api/Category',
+  'dataType': 'json',
+  "contentType": "application/json; charset=utf-8",
+}
 // let ELEMENTOSDB = null;
 let ELEMENT = null;
 const TABLA = "category"
-const propMessage = {
-  "messageText": "",
-  "cloud": "",
-  "client": ""
+const propCategoria = {
+  "name": "",
+  "description": "",
+  "clouds": ""
 }
 
 /**
- *  1:41 Min
+ *  1:41 Min 
  */
 
 /**
@@ -26,11 +26,11 @@ function limiparCampos() {
 
 /**
  * Funcion que pinta el contenido de la tabla
- * @param {Response} response
+ * @param {Response} response 
  */
 function pintarElemento(response) {
   $("#contenidoTabla").empty();
-  const rows = crearElemento(response, TABLA, propMessage);
+  const rows = crearElemento(response, TABLA, propCategoria);
   rows.forEach((row) => {
     $("#contenidoTabla").append(row);
   });
@@ -40,7 +40,7 @@ function pintarElemento(response) {
  * Funcion que guarda en un objeto los campos del formulario
  * @returns Objeto con los datos del formulario
  */
-function obtenerCampos() {
+ function obtenerCampos() {
   const data = {
     name: $("#name").val(),
     description: $("#description").val(),
@@ -50,7 +50,7 @@ function obtenerCampos() {
 
 /**
  * Funcion que asigna a los campos del formulario los datos entregados
- * @param {Object} data
+ * @param {Object} data 
  */
 function setCampos(data) {
   $("#name").val(data.name);
@@ -60,7 +60,7 @@ function setCampos(data) {
 /**
  * Funcion para validar que los campos no esten vacios
  */
-function validar() {
+ function validar() {
   const elements = document.querySelectorAll(".form input");
   return validarCamposVacios(elements);
 }
@@ -71,22 +71,22 @@ function validar() {
  */
 async function obtenerElemento(event) {
   const btn = event.target;
-  const messageText = btn.parentElement.parentElement.firstChild.innerHTML;
-  const elemento = elementoEnBD(ELEMENTOSDB_MESSAGE, messageText);
+  const nameElement = btn.parentElement.parentElement.firstChild.innerHTML;
+  const elemento = elementoEnBD(ELEMENTOSDB_CATEGORY, nameElement)
   if (!elemento) {
-    alert("Error: " + nameElement + " no encontrado en DB");
+    alert("Error: " + nameElement + " no encontrado en DB")
   }
   ELEMENT = elemento;
-  if (btn.textContent === "Editar") {
+  if (btn.textContent === "Editar"){
     setCampos(elemento);
   } else {
-    eliminar(elemento.name);
+    eliminar(elemento.name)
   }
 }
 
-function elementoEnBD(datos, message) {
-  for (let element of datos) {
-    if (element.messageText === message) {
+function elementoEnBD(datos, name){
+  for (let element of datos){
+    if (element.name === name){
       return element;
     }
   }
@@ -105,7 +105,6 @@ async function traerDatos() {
       dataType: DATAREQUEST.dataType,
     });
     pintarElemento(response);
-    ELEMENTOSDB = response;
     return response;
   } catch (error) {
     alert(`Hubo un problema trayendo los datos, Error: ${error.message}`);
@@ -144,6 +143,7 @@ $("#btnCrear").click(function crear() {
  * la funcion consultar para llenar la tabla con los datos actualizados
  */
 $("#btnActualizar").click(function actualizar() {
+  console.log("Hola")
   if (!validar()) {
     alert("Se deben llenar los campos.");
   } else {
@@ -161,7 +161,7 @@ $("#btnActualizar").click(function actualizar() {
       data: JSON.stringify(data),
       contentType: DATAREQUEST.contentType,
       statusCode: {
-        204: function () {
+        201: function () {
           alert("La operacion fue exitosa");
           limiparCampos();
           traerDatos();
@@ -169,7 +169,7 @@ $("#btnActualizar").click(function actualizar() {
       },
     });
   }
-});
+})
 
 /**
  * Funcion para eliminar dato de CLOUD
@@ -177,8 +177,10 @@ $("#btnActualizar").click(function actualizar() {
  * para traer los datos actualizados
  * @param {name} name nombre del elemento a eliminar
  */
-function eliminar(name) {
-  const r = confirm("Segur@ de eliminar la categoria con nombre: " + name); // Se pregunta si está seguro de eliminar.
+ function eliminar(name) {
+  const r = confirm(
+    "Segur@ de eliminar la categoria con nombre: " + name
+  ); // Se pregunta si está seguro de eliminar.
   if (r == true) {
     //Si está seguro, se procede a eliminar.
     $.ajax({
@@ -200,5 +202,5 @@ function eliminar(name) {
  * consultar para trear los datos del servicio REST
  */
 $(document).ready(function () {
-  traerDatos();
+  traerDatos()
 });

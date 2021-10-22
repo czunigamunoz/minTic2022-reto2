@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cloud</title>
+    <title>Reservation</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-uWxY/CJNBR+1zjPWmfnSnVxwRheevXITnMqoEIeG1LJrdI0GlVs/9cVSyPYXdcSF" crossorigin="anonymous">
     <link rel="stylesheet" href="../css/estilos.css">
@@ -13,19 +13,16 @@
 
 <body>
     <a href="../index.html" class="btn-atras">Atras</a>
-    <h1 class="text-center mt-2">Formulario CLOUD</h1>
+    <h1 class="text-center mt-2">Formulario RESERVATION</h1>
     <div class="container-fluid mt-3">
         <div class="row">
             <table class="table table-borderless">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Brand</th>
-                        <th>Year</th>
-                        <th>Description</th>
-                        <th>Category</th>
-                        <th>Messages</th>
-                        <th>Reservations</th>
+                        <th>Id</th>
+                        <th>Status</th>
+                        <th>Cloud</th>
+                        <th>Client</th>
                         <th colspan="2">Accion</th>
                     </tr>
                 </thead>
@@ -37,33 +34,21 @@
         <br />
         <div class="row">
             <div class="col-2">
-                <label for="name">Name</label>
-                <input class="form-control form-control-sm" type="text" placeholder="Cloud's Name" id="name">
+                <label for="id">Id</label>
+                <input class="form-control form-control-sm" type="text" placeholder="Id" id="id">
             </div>
             <div class="col-2">
-                <label for="brand">Brand</label>
-                <input class="form-control form-control-sm" type="text" placeholder="Brand" id="brand">
+                <label for="status">Status</label>
+                <input class="form-control form-control-sm" type="text" placeholder="Status" id="status">
             </div>
             <div class="col-2">
-                <label for="year">Year</label>
-                <input class="form-control form-control-sm" type="number" placeholder="Year" id="year">
+                <label for="client">Client</label>
+                <input class="form-control form-control-sm" type="number" placeholder="Client" id="client">
             </div>
             <div class="col-2">
-                <label for="description">Description</label>
-                <input class="form-control form-control-sm" type="text" placeholder="Description" id="description">
+                <label for="cloud">Cloud</label>
+                <input class="form-control form-control-sm" type="text" placeholder="Cloud" id="cloud">
             </div>
-            <div class="col-2">
-                <label for="category">Category</label>
-                <input class="form-control form-control-sm" type="text" placeholder="Category" id="category">
-            </div>
-            <!-- <div class="col-2">
-                <label for="messages">Messages</label>
-                <input class="form-control form-control-sm" type="text" placeholder="Messages" id="messages">
-            </div>
-            <div class="col-2">
-                <label for="reservations">Reservations</label>
-                <input class="form-control form-control-sm" type="text" placeholder="Reservations" id="reservations">
-            </div> -->
         </div>
         <br />
         <div class="d-flex justify-content-start gap-3">
@@ -71,12 +56,13 @@
             <button type="button" class="btn btn-outline-warning" id="btnActualizar">Actualizar</button>
         </div>
     </div>
+    </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-kQtW33rZJAHjgefvhyyzcGF3C5TFyBQBA13V1RKPf4uH+bwyzQxZ6CmMZHmNBEfJ"
         crossorigin="anonymous"></script>
     <script src="../js/utils.js"></script>
-    <script src="../js/cloud.js"></script>
+    <script src="../js/reservations.js"></script>
 </body>
 
 </html>

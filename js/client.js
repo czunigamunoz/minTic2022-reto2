@@ -1,14 +1,83 @@
-const URL = "https://g7bd7930521103a-db202109300648.adb.sa-saopaulo-1.oraclecloudapps.com/ords/admin/client/client";
-const DATATYPE = "json";
+const DATAREQUEST = {
+  url: "http://localhost:8080/api/Client",
+  dataType: "json",
+  contentType: "application/json; charset=utf-8",
+};
+// let ELEMENTOSDB = null;
+let ELEMENT = null;
+const TABLA = "client"
+const propCliente = {
+  "name": "",
+  "email": "",
+  "password": "",
+  "age": "",
+  "messages": "",
+  "reservations": ""
+}
+
+/**
+ *  1:41 Min
+ */
 
 /**
  * Funcion que limpia los campos del formulario
  */
 function limiparCampos() {
-    $("#id").val("");
-    $("#name").val("");
-    $("#email").val("");
-    $("#age").val("");
+  $("#name").val("");
+  $("#email").val("");
+  $("#password").val("");
+  $("#age").val("");
+}
+
+/**
+ * Funcion que pinta el contenido de la tabla
+ * @param {Response} response
+ */
+function pintarElemento(response) {
+  $("#contenidoTabla").empty();
+  const rows = crearElemento(response, TABLA, propCliente);
+  rows.forEach((row) => {
+    $("#contenidoTabla").append(row);
+  });
+
+// $.ajax({
+//     url:DATAREQUEST.url + "/all",
+//     type:"GET",
+//     dataType:DATAREQUEST.dataType,
+//     success: function (respose){
+//         $("#contenidoTabla").empty();
+//         respose.forEach(element => {
+//             let row = $("<tr>");
+//             row.append($("<td>").text(element.name));
+//             row.append($("<td>").text(element.email));
+//             row.append($("<td>").text(element.password));
+//             row.append($("<td>").text(element.age));
+//             row.append($("<td>").text(element.messages));
+//             row.append($("<td>").text(element.reservations));
+//             row.append(
+//                 $("<td class='text-center no-padding'>")
+//                 .append(
+//                   '<button type="button" class="btn btn-outline-warning btn-block w-100" onclick="actualizarCloud('
+//                    + element.id +
+//                   ')">Editar</button>'
+//                 )
+//               );
+//               row.append(
+//                 $("<td class='text-center'>").append(
+//                   '<button type="button" class="btn btn-outline-danger btn-block w-100" onclick="eliminar(' +
+//                     element.id +
+//                     ",'" +
+//                     element.messagetext +
+//                     "')\">Eliminar</button>"
+//                 )
+//               );
+//            $("#contenidoTabla").append(row);
+//         });
+//     },
+//     error: function(xhr,status){
+//         alert("Ocurrió un error en el consumo.");
+//     }
+// });
 }
 
 /**
@@ -16,173 +85,178 @@ function limiparCampos() {
  * @returns Objeto con los datos del formulario
  */
 function obtenerCampos() {
-    const data = {
-      id: $("#id").val(),
-      name: $("#name").val(),
-      email: $("#email").val(),
-      age: $("#age").val(),
-    };
-    return data;
+  const data = {
+    name: $("#name").val(),
+    email: $("#email").val(),
+    password: $("#password").val(),
+    age: $("#age").val(),
+  };
+  return data;
+}
+
+/**
+ * Funcion que asigna a los campos del formulario los datos entregados
+ * @param {Object} data
+ */
+function setCampos(data) {
+  $("#name").val(data.name);
+  $("#email").val(data.email);
+  $("#password").val(data.password);
+  $("#age").val(data.age);
+}
+
+/**
+ * Funcion para validar que los campos no esten vacios
+ */
+function validar() {
+  const elements = document.querySelectorAll(".form input");
+  return validarCamposVacios(elements);
+}
+
+/**
+ * Funcion que determina el elemento a ser editado o eliminado
+ * @param {Event} event evento click en editar y eliminar
+ */
+async function obtenerElemento(event) {
+
+  console.log(ELEMENTOSDB_CLIENT)
+
+  const btn = event.target;
+  const nameElement = btn.parentElement.parentElement.children[2].innerHTML
+
+  const elemento = elementoEnBD(ELEMENTOSDB_CLIENT, nameElement);
+  if (!elemento) {
+    alert("Error: " + nameElement + " no encontrado en DB");
+  }
+  ELEMENT = elemento;
+  if (btn.textContent === "Editar") {
+    setCampos(elemento);
+  } else {
+    eliminar(elemento.name);
+  }
+}
+
+function elementoEnBD(datos, name) {
+  console.log(datos);
+  for (let element of datos) {
+    if (element.name === name) {
+      return element;
+    }
+  }
+  return null;
 }
 
 /**
  * Funcion que hace peticion GET al servicio REST
- * los agrega en la tabla y agrega dos botones a
- * cada campo, un boton de actualizar y de eliminar
  */
-function consultar(){
+async function traerDatos() {
+  let response;
+  try {
+    response = await $.ajax({
+      url: DATAREQUEST.url + "/all",
+      type: "GET",
+      dataType: DATAREQUEST.dataType,
+    });
+    pintarElemento(response);
+    ELEMENTOSDB = response;
+    return response;
+  } catch (error) {
+    alert(`Hubo un problema trayendo los datos, Error: ${error.message}`);
+  }
+}
+
+/**
+ * Funcion para crear un nuevo campo a la tabla CLOUD
+ * despues limpia los campos del formulario y llama a
+ * la funcion consultar para llenar la tabla con los datos actualizados
+ */
+$("#btnCrear").click(function crear() {
+    console.log(validar())
+  if (!validar()) {
+    alert("Se deben llenar los campos.");
+  } else {
+    const dataCategory = JSON.stringify(obtenerCampos());
     $.ajax({
-        url:URL,
-        type:"GET",
-        dataType:DATATYPE,
-        success: function (respose){
-            $("#contenidoTabla").empty();
-            respose.items.forEach(element => {
-                let row = $("<tr>");
-                row.append($("<td>").text(element.id));
-                row.append($("<td>").text(element.name));
-                row.append($("<td>").text(element.email));
-                row.append($("<td>").text(element.age));
-                row.append(
-                    $("<td class='text-center no-padding'>")
-                    .append(
-                      '<button type="button" class="btn btn-outline-warning btn-block w-100" onclick="actualizarCloud('
-                       + element.id +
-                      ')">Editar</button>'
-                    )
-                  );
-                  row.append(
-                    $("<td class='text-center'>").append(
-                      '<button type="button" class="btn btn-outline-danger btn-block w-100" onclick="eliminar(' +
-                        element.id +
-                        ",'" +
-                        element.name +
-                        "')\">Eliminar</button>"
-                    )
-                  );
-               $("#contenidoTabla").append(row);
-            });
+      url: DATAREQUEST.url + "/save",
+      type: "POST",
+      dataType: DATAREQUEST.dataType,
+      data: dataCategory,
+      contentType: DATAREQUEST.contentType,
+      statusCode: {
+        201: function () {
+          alert("Se agrego el cliente exitosamente");
+          limiparCampos();
+          traerDatos();
         },
-        error: function(xhr,status){
-            alert("Ocurrió un error en el consumo.");
-        }
+      },
     });
-}
+  }
+});
 
 /**
- * Funcion para crear un nuevo campo a la tabla CLIENT
+ * Funcion para actualizar dato de CLOUD
  * despues limpia los campos del formulario y llama a
  * la funcion consultar para llenar la tabla con los datos actualizados
  */
-function crear(){
-    const dataClient = obtenerCampos();
-    $.ajax({
-        url:URL,
-        type:"POST",
-        dataType:DATATYPE,
-        data: dataClient,
-        statusCode: {
-            201: function(){
-                limiparCampos();
-                consultar();
-            }
-        }
-    });
-}
-
-/**
- * Funcion para actualizar dato de CLIENT
- * despues limpia los campos del formulario y llama a
- * la funcion consultar para llenar la tabla con los datos actualizados
- */
-function actualizar(){
-    const dataClient = obtenerCampos();
+$("#btnActualizar").click(function actualizar() {
+  if (!validar()) {
+    return alert("Se deben llenar los campos.");
+  } else {
+    console.log("Entre")
+    const dataCategory = obtenerCampos();
     const data = {
-        id:dataClient.id,
-        name:dataClient.name,
-        email:dataClient.email,
-        age:dataClient.age
+      idClient: ELEMENT.idClient,
+      name: dataCategory.name,
+      email: dataCategory.email,
+      password: dataCategory.password,
+      age: dataCategory.age,
     }; // Se crea un objeto con los datos a actualizar.
     $.ajax({
-        url:URL,
-        type:"PUT",
-        dataType:DATATYPE,
-        data:JSON.stringify(data),
-        headers: {
-            "Content-Type": "application/json"
+      url: DATAREQUEST.url + "/update",
+      type: "PUT",
+      dataType: DATAREQUEST.dataType,
+      data: JSON.stringify(data),
+      contentType: DATAREQUEST.contentType,
+      statusCode: {
+        201: function () {
+          alert("La operacion fue exitosa");
+          limiparCampos();
+          traerDatos();
         },
-        statusCode: {
-            201: function(){
-                limiparCampos();
-                $("#id").attr("readonly",false);
-                consultar();
-            }
-        }
+      },
     });
-}
+  }
+});
 
 /**
- * Funcion para eliminar dato de CLIENT
+ * Funcion para eliminar dato de CLOUD
  * si la respuesta es 204, llama a la funcion consultar
  * para traer los datos actualizados
- * @param {number} id Id de client
- * @param {string} name Name de client
+ * @param {name} name nombre del elemento a eliminar
  */
-function eliminar(id,name){
-    const r = confirm("Segur@ de eliminar el cliente: "+id+" con nombre: "+name); //Primero preguntamos si está seguro de eliminar.
-    if (r == true) { //Si está seguro, se procede a eliminar.
-        const data = {
-            id:id
-        }; // Se crea un objeto con los datos a eliminar.
-        $.ajax({
-            url:URL,
-            type:"DELETE",
-            dataType:DATATYPE,
-            data:JSON.stringify(data),
-            headers: {
-                "Content-Type": "application/json"
-            },
-            statusCode: {
-                204: function(){ 
-                    consultar();
-                }
-            }
-        });
-    }
-}
-
-/**
- * Funcion para obtener los datos de un client mediante una
- * consulta get y el id, para luego rellenar con esa informacion
- * los campos del formulario
- * @param {number} id Id de client
- */
-function actualizarCloud(id){
+function eliminar(name) {
+  const r = confirm("Segur@ de eliminar la categoria con nombre: " + name); // Se pregunta si está seguro de eliminar.
+  if (r == true) {
+    //Si está seguro, se procede a eliminar.
     $.ajax({
-        url:URL+"/?id="+id,
-        type:"GET",
-        dataType:"json",
-        success: function (respose){
-            if(respose.items.length>0){
-                $("#id").val(respose.items[0].id);
-                $("#id").attr("readonly",true);
-                $("#name").val(respose.items[0].name);
-                $("#email").val(respose.items[0].email);
-                $("#age").val(respose.items[0].age);
-            }else{
-                alert("No se encontró el registro.");
-            }
+      url: DATAREQUEST.url + `/${ELEMENT.idClient}`,
+      type: "DELETE",
+      dataType: DATAREQUEST.dataType,
+      contentType: DATAREQUEST.contentType,
+      statusCode: {
+        204: function () {
+          alert("Se elimino el cliente exitosamente");
+          traerDatos();
         },
-        error: function(xhr,status){
-            alert("Ocurrió un error en el consumo.");
-        }
+      },
     });
+  }
 }
 
 /**
  * Cuando el HTML carga manda a llamar a la funcion
  * consultar para trear los datos del servicio REST
  */
-$(document).ready(function(){
-    consultar();
+$(document).ready(function () {
+  traerDatos();
 });
