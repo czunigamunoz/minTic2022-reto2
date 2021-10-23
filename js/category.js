@@ -3,9 +3,8 @@ const DATAREQUEST = {
   'dataType': 'json',
   "contentType": "application/json; charset=utf-8",
 }
-// let ELEMENTOSDB = null;
+let ELEMENTOSDB = null;
 let ELEMENT = null;
-const TABLA = "category"
 const propCategoria = {
   "name": "",
   "description": "",
@@ -30,7 +29,7 @@ function limiparCampos() {
  */
 function pintarElemento(response) {
   $("#contenidoTabla").empty();
-  const rows = crearElemento(response, TABLA, propCategoria);
+  const rows = crearElemento(response, propCategoria);
   rows.forEach((row) => {
     $("#contenidoTabla").append(row);
   });
@@ -72,7 +71,7 @@ function setCampos(data) {
 async function obtenerElemento(event) {
   const btn = event.target;
   const nameElement = btn.parentElement.parentElement.firstChild.innerHTML;
-  const elemento = elementoEnBD(ELEMENTOSDB_CATEGORY, nameElement)
+  const elemento = elementoEnBD(ELEMENTOSDB, nameElement)
   if (!elemento) {
     alert("Error: " + nameElement + " no encontrado en DB")
   }

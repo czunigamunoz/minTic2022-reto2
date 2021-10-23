@@ -3,8 +3,10 @@ const DATAREQUEST = {
   dataType: "json",
   contentType: "application/json; charset=utf-8",
 };
-// let ELEMENTOSDB = null;
+let ELEMENTOSDB = null;
 let ELEMENT = null;
+let ELEMENTSDB_CLOUDS = null;
+let ELEMENTSDB_CLIENTS = null;
 const TABLA = "category"
 const propMessage = {
   "messageText": "",
@@ -12,9 +14,37 @@ const propMessage = {
   "client": ""
 }
 
-/**
- *  1:41 Min
- */
+async function inputCloud(){
+  const clouds = await $.ajax({
+    url: "http://localhost:8080/api/Cloud/all",
+    type: "GET",
+    dataType: DATAREQUEST.dataType
+  });
+  ELEMENTSDB_CLOUDS = clouds;
+  for (let i = 0; i < clouds.length; i++) {
+    let option = document.createElement("option")
+    option.setAttribute("class", "select-item")
+    option.value = clouds[i].name
+    option.text = clouds[i].name
+    $("#cloud").append(option)
+  }
+}
+
+async function inputClient(){
+  const clients = await $.ajax({
+    url: "http://localhost:8080/api/Client/all",
+    type: "GET",
+    dataType: DATAREQUEST.dataType
+  });
+  ELEMENTSDB_CLIENTS = clients;
+  for (let i = 0; i < clients.length; i++) {
+    let option = document.createElement("option")
+    option.setAttribute("class", "select-item")
+    option.value = clients[i].name
+    option.text = clients[i].name
+    $("#client").append(option)
+  }
+}
 
 /**
  * Funcion que limpia los campos del formulario
@@ -30,7 +60,7 @@ function limiparCampos() {
  */
 function pintarElemento(response) {
   $("#contenidoTabla").empty();
-  const rows = crearElemento(response, TABLA, propMessage);
+  const rows = crearElemento(response, propMessage);
   rows.forEach((row) => {
     $("#contenidoTabla").append(row);
   });
@@ -42,8 +72,9 @@ function pintarElemento(response) {
  */
 function obtenerCampos() {
   const data = {
-    name: $("#name").val(),
-    description: $("#description").val(),
+    messageText: $("#messageText").val(),
+    cloud: $("#cloud").val(),
+    client: $("#client").val(),
   };
   return data;
 }
@@ -53,16 +84,10 @@ function obtenerCampos() {
  * @param {Object} data
  */
 function setCampos(data) {
-  $("#name").val(data.name);
-  $("#description").val(data.description);
-}
-
-/**
- * Funcion para validar que los campos no esten vacios
- */
-function validar() {
-  const elements = document.querySelectorAll(".form input");
-  return validarCamposVacios(elements);
+  console.log(data);
+  $("#messageText").val(data.messageText);
+  $("#cloud").val(data.cloud.name).attr("disabled","disabled");
+  $("#client").val(data.client.name).attr("disabled","disabled");
 }
 
 /**
@@ -72,25 +97,32 @@ function validar() {
 async function obtenerElemento(event) {
   const btn = event.target;
   const messageText = btn.parentElement.parentElement.firstChild.innerHTML;
-  const elemento = elementoEnBD(ELEMENTOSDB_MESSAGE, messageText);
+  const elemento = messageEnBD(ELEMENTOSDB, messageText);
   if (!elemento) {
-    alert("Error: " + nameElement + " no encontrado en DB");
+    alert("Error: " + messageText + " no encontrado en DB");
   }
   ELEMENT = elemento;
   if (btn.textContent === "Editar") {
     setCampos(elemento);
   } else {
-    eliminar(elemento.name);
+    eliminar(elemento.messageText);
   }
 }
 
-function elementoEnBD(datos, message) {
+function messageEnBD(datos, data) {
   for (let element of datos) {
-    if (element.messageText === message) {
+    if (element.messageText === data) {
       return element;
     }
   }
-  return null;
+}
+
+function elementoEnBD(datos, data) {
+  for (let element of datos) {
+    if (element.name === data) {
+      return element;
+    }
+  }
 }
 
 /**
@@ -112,21 +144,45 @@ async function traerDatos() {
   }
 }
 
+function organizarDatos(typeMethod){
+  const dataMessage = obtenerCampos();
+  const cloud = elementoEnBD(ELEMENTSDB_CLOUDS, dataMessage.cloud)
+  const client = elementoEnBD(ELEMENTSDB_CLIENTS, dataMessage.client)
+  let data
+  if (typeMethod === "post"){
+    data = {
+      messageText: dataMessage.messageText,
+      client: {"idClient": client.idClient},
+      cloud: {"id": cloud.id},
+    }
+  }
+  if (typeMethod === "put"){
+    data = {
+      idMessage: ELEMENT.idMessage,
+      messageText: dataMessage.messageText,
+      client: {"idClient": client.idClient},
+      cloud: {"id": cloud.id},
+    }
+
+  }
+  return data;
+}
+
 /**
  * Funcion para crear un nuevo campo a la tabla CLOUD
  * despues limpia los campos del formulario y llama a
  * la funcion consultar para llenar la tabla con los datos actualizados
  */
 $("#btnCrear").click(function crear() {
-  if (!validar()) {
+  if (!$("#messageText").val()) {
     alert("Se deben llenar los campos.");
   } else {
-    const dataCategory = JSON.stringify(obtenerCampos());
+    const data = organizarDatos("post");
     $.ajax({
       url: DATAREQUEST.url + "/save",
       type: "POST",
       dataType: DATAREQUEST.dataType,
-      data: dataCategory,
+      data: JSON.stringify(data),
       contentType: DATAREQUEST.contentType,
       statusCode: {
         201: function () {
@@ -144,16 +200,10 @@ $("#btnCrear").click(function crear() {
  * la funcion consultar para llenar la tabla con los datos actualizados
  */
 $("#btnActualizar").click(function actualizar() {
-  if (!validar()) {
+  if (!$("#messageText").val()) {
     alert("Se deben llenar los campos.");
   } else {
-    const dataCategory = obtenerCampos();
-    const data = {
-      id: ELEMENT.id,
-      name: dataCategory.name,
-      description: dataCategory.description,
-      cloud: [],
-    }; // Se crea un objeto con los datos a actualizar.
+    const data = organizarDatos("put");
     $.ajax({
       url: DATAREQUEST.url + "/update",
       type: "PUT",
@@ -161,8 +211,10 @@ $("#btnActualizar").click(function actualizar() {
       data: JSON.stringify(data),
       contentType: DATAREQUEST.contentType,
       statusCode: {
-        204: function () {
+        201: function () {
           alert("La operacion fue exitosa");
+          $("#cloud").attr("disabled","");
+          $("#client").attr("disabled","");
           limiparCampos();
           traerDatos();
         },
@@ -177,12 +229,12 @@ $("#btnActualizar").click(function actualizar() {
  * para traer los datos actualizados
  * @param {name} name nombre del elemento a eliminar
  */
-function eliminar(name) {
-  const r = confirm("Segur@ de eliminar la categoria con nombre: " + name); // Se pregunta si está seguro de eliminar.
+function eliminar(message) {
+  const r = confirm("Segur@ de eliminar el mensaje: " + message); // Se pregunta si está seguro de eliminar.
   if (r == true) {
     //Si está seguro, se procede a eliminar.
     $.ajax({
-      url: DATAREQUEST.url + `/${ELEMENT.id}`,
+      url: DATAREQUEST.url + `/${ELEMENT.idMessage}`,
       type: "DELETE",
       dataType: DATAREQUEST.dataType,
       contentType: DATAREQUEST.contentType,
@@ -201,4 +253,6 @@ function eliminar(name) {
  */
 $(document).ready(function () {
   traerDatos();
+  inputCloud();
+  inputClient();
 });

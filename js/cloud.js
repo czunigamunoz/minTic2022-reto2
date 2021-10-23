@@ -3,9 +3,9 @@ const DATAREQUEST = {
   'dataType': 'json',
   "contentType": "application/json; charset=utf-8",
 }
-// let ELEMENTOSDB = null;
+let ELEMENTOSDB = null;
 let ELEMENT = null;
-const TABLA = "cloud"
+let ELEMENTSDB_CATEGORY = null;
 const propCategoria = {
   "name": "",
   "brand": "",
@@ -16,9 +16,21 @@ const propCategoria = {
   "reservations": ""
 }
 
-/**
- *  1:41 Min 
- */
+async function inputCategory(){
+  const categories = await $.ajax({
+    url: "http://localhost:8080/api/Category/all",
+    type: "GET",
+    dataType: DATAREQUEST.dataType
+  });
+  ELEMENTSDB_CATEGORY = categories;
+  for (let i = 0; i < categories.length; i++) {
+    let option = document.createElement("option")
+    option.setAttribute("class", "select-item")
+    option.value = categories[i].name
+    option.text = categories[i].name
+    $("#category").append(option)
+  }
+}
 
 /**
  * Funcion que limpia los campos del formulario
@@ -37,7 +49,7 @@ function limiparCampos() {
  */
 function pintarElemento(response) {
   $("#contenidoTabla").empty();
-  const rows = crearElemento(response, TABLA, propCategoria);
+  const rows = crearElemento(response, propCategoria);
   rows.forEach((row) => {
     $("#contenidoTabla").append(row);
   });
@@ -63,12 +75,11 @@ function pintarElemento(response) {
  * @param {Object} data 
  */
 function setCampos(data) {
-  console.log(data.category);
   $("#name").val(data.name);
   $("#brand").val(data.brand);
   $("#year").val(data.year);
   $("#description").val(data.description);
-  $("#category").val(data.category.id);
+  $("#category").val(data.category.name).attr("disabled","disabled");
 }
 
 /**
@@ -84,12 +95,9 @@ function setCampos(data) {
  * @param {Event} event evento click en editar y eliminar
  */
 async function obtenerElemento(event) {
-
-  // return alert("En construccion");
-
   const btn = event.target;
   const nameElement = btn.parentElement.parentElement.firstChild.innerHTML;
-  const elemento = elementoEnBD(ELEMENTOSDB_CLOUD, nameElement)
+  const elemento = elementoEnBD(ELEMENTOSDB, nameElement)
   if (!elemento) {
     alert("Error: " + nameElement + " no encontrado en DB")
   }
@@ -107,7 +115,6 @@ function elementoEnBD(datos, name){
       return element;
     }
   }
-  return null;
 }
 
 /**
@@ -129,6 +136,32 @@ async function traerDatos() {
   }
 }
 
+function organizarDatos(typeMethod){
+  const dataCategory = obtenerCampos();
+  const category = elementoEnBD(ELEMENTSDB_CATEGORY, dataCategory.category)
+  let data
+  if (typeMethod === "post"){
+    data = {
+      brand: dataCategory.brand,
+      year: parseInt(dataCategory.year),
+      category: {"id": category.id},
+      name: dataCategory.name,      
+      description: dataCategory.description,  
+    }
+  }
+  if (typeMethod === "put"){
+    data = {
+      id: ELEMENT.id,
+      brand: dataCategory.brand,
+      name: dataCategory.name,
+      year: parseInt(dataCategory.year),
+      description: dataCategory.description,
+      category: {"id": category.id},
+    }
+  }
+  return data;  
+}
+
 /**
  * Funcion para crear un nuevo campo a la tabla CLOUD
  * despues limpia los campos del formulario y llama a
@@ -138,14 +171,7 @@ $("#btnCrear").click(function crear() {
   if (!validar()) {
     alert("Se deben llenar los campos.");
   } else {
-    const dataCategory = obtenerCampos();
-    const data = {
-      brand: dataCategory.brand,
-      year: parseInt(dataCategory.year),
-      category: {"id": parseInt(dataCategory.category)},
-      name: dataCategory.name,      
-      description: dataCategory.description,      
-    };
+    const data = organizarDatos("post");
     $.ajax({
       url: DATAREQUEST.url + "/save",
       type: "POST",
@@ -173,15 +199,7 @@ $("#btnActualizar").click(function actualizar() {
   if (!validar()) {
     alert("Se deben llenar los campos.");
   } else {
-    const dataCategory = obtenerCampos();
-    const data = {
-      id: ELEMENT.id,
-      brand: dataCategory.brand,
-      name: dataCategory.name,
-      year: parseInt(dataCategory.year),
-      description: dataCategory.description,
-      category: {"id": parseInt(dataCategory.category)},
-    }; // Se crea un objeto con los datos a actualizar.
+    const data = organizarDatos("put");
     $.ajax({
       url: DATAREQUEST.url + "/update",
       type: "PUT",
@@ -191,6 +209,7 @@ $("#btnActualizar").click(function actualizar() {
       statusCode: {
         201: function () {
           alert("La operacion fue exitosa");
+          $("#category").attr("disabled", "")
           limiparCampos();
           traerDatos();
         },
@@ -231,4 +250,5 @@ $("#btnActualizar").click(function actualizar() {
  */
 $(document).ready(function () {
   traerDatos()
+  inputCategory()
 });

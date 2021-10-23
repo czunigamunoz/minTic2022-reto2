@@ -3,9 +3,8 @@ const DATAREQUEST = {
   dataType: "json",
   contentType: "application/json; charset=utf-8",
 };
-// let ELEMENTOSDB = null;
+let ELEMENTOSDB = null;
 let ELEMENT = null;
-const TABLA = "client"
 const propCliente = {
   "name": "",
   "email": "",
@@ -14,10 +13,6 @@ const propCliente = {
   "messages": "",
   "reservations": ""
 }
-
-/**
- *  1:41 Min
- */
 
 /**
  * Funcion que limpia los campos del formulario
@@ -35,49 +30,10 @@ function limiparCampos() {
  */
 function pintarElemento(response) {
   $("#contenidoTabla").empty();
-  const rows = crearElemento(response, TABLA, propCliente);
+  const rows = crearElemento(response, propCliente);
   rows.forEach((row) => {
     $("#contenidoTabla").append(row);
   });
-
-// $.ajax({
-//     url:DATAREQUEST.url + "/all",
-//     type:"GET",
-//     dataType:DATAREQUEST.dataType,
-//     success: function (respose){
-//         $("#contenidoTabla").empty();
-//         respose.forEach(element => {
-//             let row = $("<tr>");
-//             row.append($("<td>").text(element.name));
-//             row.append($("<td>").text(element.email));
-//             row.append($("<td>").text(element.password));
-//             row.append($("<td>").text(element.age));
-//             row.append($("<td>").text(element.messages));
-//             row.append($("<td>").text(element.reservations));
-//             row.append(
-//                 $("<td class='text-center no-padding'>")
-//                 .append(
-//                   '<button type="button" class="btn btn-outline-warning btn-block w-100" onclick="actualizarCloud('
-//                    + element.id +
-//                   ')">Editar</button>'
-//                 )
-//               );
-//               row.append(
-//                 $("<td class='text-center'>").append(
-//                   '<button type="button" class="btn btn-outline-danger btn-block w-100" onclick="eliminar(' +
-//                     element.id +
-//                     ",'" +
-//                     element.messagetext +
-//                     "')\">Eliminar</button>"
-//                 )
-//               );
-//            $("#contenidoTabla").append(row);
-//         });
-//     },
-//     error: function(xhr,status){
-//         alert("Ocurrió un error en el consumo.");
-//     }
-// });
 }
 
 /**
@@ -100,7 +56,7 @@ function obtenerCampos() {
  */
 function setCampos(data) {
   $("#name").val(data.name);
-  $("#email").val(data.email);
+  $("#email").val(data.email).attr("readonly", "true");
   $("#password").val(data.password);
   $("#age").val(data.age);
 }
@@ -118,13 +74,10 @@ function validar() {
  * @param {Event} event evento click en editar y eliminar
  */
 async function obtenerElemento(event) {
-
-  console.log(ELEMENTOSDB_CLIENT)
-
   const btn = event.target;
   const nameElement = btn.parentElement.parentElement.children[2].innerHTML
 
-  const elemento = elementoEnBD(ELEMENTOSDB_CLIENT, nameElement);
+  const elemento = elementoEnBD(ELEMENTOSDB, nameElement);
   if (!elemento) {
     alert("Error: " + nameElement + " no encontrado en DB");
   }
@@ -220,6 +173,7 @@ $("#btnActualizar").click(function actualizar() {
       statusCode: {
         201: function () {
           alert("La operacion fue exitosa");
+          $("#email").val(data.email).attr("readonly", "false");
           limiparCampos();
           traerDatos();
         },

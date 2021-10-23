@@ -3,11 +3,9 @@ const DATAREQUEST = {
     dataType: "json",
     contentType: "application/json; charset=utf-8",
   };
-  // let ELEMENTOSDB = null;
+  let ELEMENTOSDB = null;
   let ELEMENT = null;
-  const TABLA = "reservation"
   const propReservation = {
-    "idReservation": "",
     "status": "",
     "cloud": "",
     "client": ""
@@ -21,7 +19,6 @@ const DATAREQUEST = {
    * Funcion que limpia los campos del formulario
    */
   function limiparCampos() {
-    $("#id").val("");
     $("#status").val("");
     $("#cloud").val("");
     $("#client").val("");    
@@ -33,7 +30,7 @@ const DATAREQUEST = {
    */
   function pintarElemento(response) {
     $("#contenidoTabla").empty();
-    const rows = crearElemento(response, TABLA, propReservation);
+    const rows = crearElemento(response, propReservation);
     rows.forEach((row) => {
       $("#contenidoTabla").append(row);
     });
@@ -45,7 +42,6 @@ const DATAREQUEST = {
    */
   function obtenerCampos() {
     const data = {
-      id: $("#id").val(),
       status: $("#status").val(),  
       cloud: $("#cloud").val(),
       client: $("#client").val(),
@@ -77,7 +73,7 @@ const DATAREQUEST = {
   async function obtenerElemento(event) {
     const btn = event.target;
     const idElement = btn.parentElement.parentElement.firstChild.innerHTML;
-    const elemento = elementoEnBD(ELEMENTOSDB_RESERVATION, idElement);
+    const elemento = elementoEnBD(ELEMENTOSDB, idElement);
     if (!elemento) {
       alert("Error: " + nameElement + " no encontrado en DB");
     }

@@ -1,9 +1,3 @@
-let ELEMENTOSDB_CATEGORY = null;
-let ELEMENTOSDB_CLOUD = null;
-let ELEMENTOSDB_CLIENT = null;
-let ELEMENTOSDB_MESSAGE = null;
-let ELEMENTOSDB_RESERVATION = null;
-
 function validarCamposVacios(campos) {
   for (let index = 0; index < campos.length; index++) {
     if (campos[index].value === "") {
@@ -45,22 +39,7 @@ function validarCampoEdad(entrada) {
   return false;
 }
 
-function crearElemento(response, tabla, properties) {
-  if (tabla === "category") {
-    ELEMENTOSDB_CATEGORY = response;
-  }
-  if (tabla === "cloud") {
-    ELEMENTOSDB_CLOUD = response;
-  }
-  if (tabla === "client"){
-    ELEMENTOSDB_CLIENT = response;
-  }
-  if (tabla === "messages"){
-    ELEMENTOSDB_MESSAGE = response;
-  }
-  if (tabla === "reservation"){
-    ELEMENTOSDB_RESERVATION = response;
-  }
+function crearElemento(response, properties) {
 
   const rows = [];
 
@@ -71,7 +50,7 @@ function crearElemento(response, tabla, properties) {
     const row = document.createElement("tr");
     for (let prop in elementTemp) {
       const col = document.createElement("td");
-      console.log("Propiedad a comparar: " + prop);
+      // console.log("Propiedad a comparar: " + prop);
 
       if (properties.hasOwnProperty(prop)) {
         if (typeof elementTemp[prop] === "string" || typeof elementTemp[prop] === "number") {
@@ -91,7 +70,7 @@ function crearElemento(response, tabla, properties) {
 
             try {
               elementTemp[prop].forEach((subProp) => {
-                console.log(subProp);
+                // console.log(subProp);
 
                 let option = document.createElement("option");
                 option.value = subProp.name ?? subProp.messageText ?? subProp.idReservation;
