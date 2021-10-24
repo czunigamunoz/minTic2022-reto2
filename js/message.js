@@ -3,47 +3,17 @@ const DATAREQUEST = {
   dataType: "json",
   contentType: "application/json; charset=utf-8",
 };
+const URL_CLOUD = "http://localhost:8080/api/Cloud/all"
+const URL_CLIENT = "http://localhost:8080/api/Client/all"
 let ID_MESSAGE = null;
-let ELEMENTSDB_CLOUDS = null;
-let ELEMENTSDB_CLIENTS = null;
-
-async function inputCloud(){
-  const clouds = await $.ajax({
-    url: "http://localhost:8080/api/Cloud/all",
-    type: "GET",
-    dataType: DATAREQUEST.dataType
-  });
-  ELEMENTSDB_CLOUDS = clouds;
-  for (let i = 0; i < clouds.length; i++) {
-    let option = document.createElement("option")
-    option.setAttribute("class", "select-item")
-    option.value = clouds[i].name
-    option.text = clouds[i].name
-    $("#cloud").append(option)
-  }
-}
-
-async function inputClient(){
-  const clients = await $.ajax({
-    url: "http://localhost:8080/api/Client/all",
-    type: "GET",
-    dataType: DATAREQUEST.dataType
-  });
-  ELEMENTSDB_CLIENTS = clients;
-  for (let i = 0; i < clients.length; i++) {
-    let option = document.createElement("option")
-    option.setAttribute("class", "select-item")
-    option.value = clients[i].name
-    option.text = clients[i].name
-    $("#client").append(option)
-  }
-}
 
 /**
  * Funcion que limpia los campos del formulario
  */
 function limiparCampos() {
   $("#messageText").val("");
+  $("#cloud").val("");
+  $("#category").val("");
 }
 
 /**
@@ -87,17 +57,69 @@ function obtenerCampos() {
 
 /**
  * Funcion que asigna a los campos del formulario los datos entregados
- * @param {Object} data
+ * @param {Object} data data traida de la base de datos
  */
 function setCampos(data) {
   $("#messageText").val(data.messageText);
-  $("#cloud").val(data.cloud.name).attr("disabled","disabled");
-  $("#client").val(data.client.name).attr("disabled","disabled");
+  const cloud = document.getElementById("cloud");
+  cloud.selectedIndex = data.cloud.id;
+  cloud.setAttribute("disabled", true);
+  const client = document.getElementById("client");
+  client.selectedIndex = data.client.idClient;
+  client.setAttribute("disabled", true)
 }
 
 /**
- * Funcion que determina el elemento a ser editado o eliminado
- * @param {Event} event evento click en editar y eliminar
+ * Funcion que trae todos los elementos de la tabla CLOUD
+ * y los pinta en el select de cloud
+ */
+async function inputCloud(){
+  const clouds = await $.ajax({
+    url: URL_CLOUD,
+    type: "GET",
+    dataType: DATAREQUEST.dataType
+  });
+  for (let i = 0; i < clouds.length; i++) {
+    let option = document.createElement("option")
+    option.setAttribute("class", "select-item")
+    option.value = clouds[i].id
+    option.text = clouds[i].name
+    $("#cloud").append(option)
+  }
+}
+
+/**
+ * Funcion que trae todos los elementos de la tabla CLIENT
+ * y los pinta en el select de client
+ */
+async function inputClient(){
+  const clients = await $.ajax({
+    url: URL_CLIENT,
+    type: "GET",
+    dataType: DATAREQUEST.dataType
+  });
+  for (let i = 0; i < clients.length; i++) {
+    let option = document.createElement("option")
+    option.setAttribute("class", "select-item")
+    option.value = clients[i].idClient
+    option.text = clients[i].name
+    $("#client").append(option)
+  }
+}
+
+/**
+ * Funcion para validar que los campos no esten vacios
+ */
+function validar(){
+  const elements = document.querySelectorAll(".form input");
+  const selectElements = document.querySelectorAll(".form select")
+
+  return validarCamposVacios(elements) && validarCamposVacios(selectElements)
+}
+
+/**
+ * Funcion que trae los datos de un mensaje por id
+ * @param {number} id de mensaje
  */
 async function obtenerElemento(id) {
   let response;
@@ -126,47 +148,33 @@ async function traerDatos() {
       dataType: DATAREQUEST.dataType,
     });
     pintarElemento(response);
-    ELEMENTOSDB = response;
     return response;
   } catch (error) {
     alert(`Hubo un problema trayendo los datos, Error: ${error.message}`);
   }
 }
 
-function messageEnBD(datos, data) {
-  for (let element of datos) {
-    if (element.messageText === data) {
-      return element;
-    }
-  }
-}
-
-function elementoEnBD(datos, data) {
-  for (let element of datos) {
-    if (element.name === data) {
-      return element;
-    }
-  }
-}
-
+/**
+ * Funcion que asigna a un objeto los valores del formulario
+ * @param {String} typeMethod Metodo http que se va a realizar 
+ * @returns Objeto con los datos del formulario
+ */
 function organizarDatos(typeMethod){
   const dataMessage = obtenerCampos();
-  const cloud = elementoEnBD(ELEMENTSDB_CLOUDS, dataMessage.cloud)
-  const client = elementoEnBD(ELEMENTSDB_CLIENTS, dataMessage.client)
   let data
   if (typeMethod === "post"){
     data = {
       messageText: dataMessage.messageText,
-      client: {"idClient": client.idClient},
-      cloud: {"id": cloud.id},
+      client: {"idClient": Number.parseInt(dataMessage.client)},
+      cloud: {"id": Number.parseInt(dataMessage.cloud)},
     }
   }
   if (typeMethod === "put"){
     data = {
       idMessage: ID_MESSAGE,
       messageText: dataMessage.messageText,
-      client: {"idClient": client.idClient},
-      cloud: {"id": cloud.id},
+      client: {"idClient": Number.parseInt(dataMessage.client)},
+      cloud: {"id": Number.parseInt(dataMessage.cloud)},
     }
 
   }
@@ -174,15 +182,14 @@ function organizarDatos(typeMethod){
 }
 
 /**
- * Funcion para crear un nuevo campo a la tabla CLOUD
- * despues limpia los campos del formulario y llama a
- * la funcion consultar para llenar la tabla con los datos actualizados
+ * Funcion para crear un nuevo campo a la tabla MESSAGE
  */
 $("#btnCrear").click(function crear() {
-  if (!$("#messageText").val()) {
+  if (!validar()) {
     alert("Se deben llenar los campos.");
   } else {
     const data = organizarDatos("post");
+    console.log(data);
     $.ajax({
       url: DATAREQUEST.url + "/save",
       type: "POST",
@@ -201,12 +208,10 @@ $("#btnCrear").click(function crear() {
 });
 
 /**
- * Funcion para actualizar dato de CLOUD
- * despues limpia los campos del formulario y llama a
- * la funcion consultar para llenar la tabla con los datos actualizados
+ * Funcion para actualizar dato de MESSAGE
  */
 $("#btnActualizar").click(function actualizar() {
-  if (!$("#messageText").val()) {
+  if (!validar()) {
     alert("Se deben llenar los campos.");
   } else {
     const data = organizarDatos("put");
@@ -219,8 +224,10 @@ $("#btnActualizar").click(function actualizar() {
       statusCode: {
         201: function () {
           alert("La operacion fue exitosa");
-          $("#cloud").attr("disabled","");
-          $("#client").attr("disabled","");
+          const cloud = document.getElementById("cloud");
+          cloud.setAttribute("disabled", false);
+          const client = document.getElementById("client");
+          client.setAttribute("disabled", false);
           limiparCampos();
           traerDatos();
         },
@@ -230,10 +237,8 @@ $("#btnActualizar").click(function actualizar() {
 });
 
 /**
- * Funcion para eliminar dato de CLOUD
- * si la respuesta es 204, llama a la funcion consultar
- * para traer los datos actualizados
- * @param {name} name nombre del elemento a eliminar
+ * Funcion para eliminar dato de MESSAGE
+ * @param {id} id del elemento a eliminar
  */
 function eliminar(id) {
   const r = confirm("Segur@ de eliminar el mensaje");

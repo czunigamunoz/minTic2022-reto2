@@ -3,19 +3,17 @@ const DATAREQUEST = {
   dataType: "json",
   contentType: "application/json; charset=utf-8",
 };
-let ELEMENTSDB_CLOUDS = null;
-let ELEMENTSDB_CLIENTS = null;
+const URL_CLOUD = "http://localhost:8080/api/Cloud/all"
+const URL_CLIENT = "http://localhost:8080/api/Client/all"
+let ID_RESERVATION = null;
 
 /**
  * Funcion que limpia los campos del formulario
  */
 function limiparCampos() {
-  $("#id").val("");
   $("#status").val("");
   $("#startDate").val("");
   $("fechaFinal").val("");
-  $("#cloud").val("");
-  $("#client").val("");
 }
 
 /**
@@ -26,21 +24,20 @@ function pintarElemento(response) {
   $("#contenidoTabla").empty();
   response.forEach((element) => {
     let row = $("<tr>");
-    row.append($("<td>").text(element.idReservation));
-    row.append($("<td>").text(element.startDate.split('T')[0]));
-    row.append($("<td>").text(element.devolutionDate.split('T')[0]));
+    row.append($("<td>").text(element.startDate.split("T")[0]));
+    row.append($("<td>").text(element.devolutionDate.split("T")[0]));
     row.append($("<td>").text(element.status));
     row.append($("<td>").text(element.cloud.name));
     row.append($("<td>").text(element.client.name));
-    
+
     row.append(
       $("<td class='text-center no-padding'>").append(
-        `<button type="button" class="btn btn-outline-warning btn-block w-100" onclick="obtenerElemento(${element.id})">Editar</button>`
+        `<button type="button" class="btn btn-outline-warning btn-block w-100" onclick="obtenerElemento(${element.idReservation})">Editar</button>`
       )
     );
     row.append(
       $("<td class='text-center'>").append(
-        `<button type="button" class="btn btn-outline-danger btn-block w-100" onclick="eliminar(${element.id})">Eliminar</button>`
+        `<button type="button" class="btn btn-outline-danger btn-block w-100" onclick="eliminar(${element.idReservation})">Eliminar</button>`
       )
     );
     $("#contenidoTabla").append(row);
@@ -53,7 +50,6 @@ function pintarElemento(response) {
  */
 function obtenerCampos() {
   const data = {
-    idReservation: $("#id").val(),
     startDate: $("#startDate").val(),
     devolutionDate: $("#devolutionDate").val(),
     status: $("#status").val(),
@@ -63,57 +59,77 @@ function obtenerCampos() {
   return data;
 }
 
-function getCurrentDate(){
-  const offset = new Date().getTimezoneOffset()
-  const date = new Date(new Date().getTime() - (offset*60*1000))
-  return date.toISOString().split('T')[0]
+/**
+ * Funcion que obtiene la fecha actual del sistema
+ * @returns Fecha en formato yyyy-mm-dd
+ */
+function getCurrentDate() {
+  const offset = new Date().getTimezoneOffset();
+  const date = new Date(new Date().getTime() - offset * 60 * 1000);
+  return date.toISOString().split("T")[0];
 }
 
 /**
  * Funcion que asigna a los campos del formulario los datos entregados
+ * @param {Object} data data traida de la base de datos
  */
 function setCampos(data) {
-  console.log(data)
+  // console.log(data);
 
   $("#startDate").attr("min", getCurrentDate());
-  const startDate = data.startDate.split('T')[0]
-  const devolutionDate = data.devolutionDate.split('T')[0]
-  $("#id").val(data.idReservation);
-  $("#startDate").attr("disabled", "");
+  const startDate = data.startDate.split("T")[0];
+  const devolutionDate = data.devolutionDate.split("T")[0];
   $("#startDate").val(startDate);
   $("#devolutionDate").val(devolutionDate);
-  $("#status").attr("disabled", "");
-  $("#cloud").val(data.cloud.name).attr("disabled", "disabled");
-  $("#client").val(data.client.name).attr("disabled", "disabled");
+
+  $("#startDate").val(startDate).attr("disabled", false);
+  $("#status").val(data.status).attr("disabled", false);
+
+  const cloud = document.getElementById("cloud");
+  cloud.selectedIndex = data.cloud.id;
+  cloud.setAttribute("disabled", true);
+  const client = document.getElementById("client");
+  client.selectedIndex = data.client.idClient;
+  client.setAttribute("disabled", true)
 }
 
+/**
+ * Funcion que trae todos los elementos de la tabla CLOUD
+ * y los pinta en el select de cloud
+ */
 async function inputCloud() {
+  $("#cloud option").remove();
   const clouds = await $.ajax({
-    url: "http://localhost:8080/api/Cloud/all",
+    url: URL_CLOUD,
     type: "GET",
     dataType: DATAREQUEST.dataType,
   });
-  ELEMENTSDB_CLOUDS = clouds;
+  $("#cloud").append($("<option>"));
   for (let i = 0; i < clouds.length; i++) {
     let option = document.createElement("option");
     option.setAttribute("class", "select-item");
-    option.value = clouds[i].name;
+    option.value = clouds[i].id;
     option.text = clouds[i].name;
     $("#cloud").append(option);
   }
 }
 
+/**
+ * Funcion que trae todos los elementos de la tabla CLIENT
+ * y los pinta en el select de client
+ */
 async function inputClient() {
+  $("#client option").remove();
   const clients = await $.ajax({
-    url: "http://localhost:8080/api/Client/all",
+    url: URL_CLIENT,
     type: "GET",
     dataType: DATAREQUEST.dataType,
   });
-  ELEMENTSDB_CLIENTS = clients;
+  $("#client").append($("<option>"));
   for (let i = 0; i < clients.length; i++) {
     let option = document.createElement("option");
     option.setAttribute("class", "select-item");
-    option.value = clients[i].name;
+    option.value = clients[i].idClient;
     option.text = clients[i].name;
     $("#client").append(option);
   }
@@ -123,10 +139,18 @@ async function inputClient() {
  * Funcion para validar que los campos no esten vacios
  */
 function validar() {
-  const elements = document.querySelectorAll(".form input");
-  return validarCamposVacios(elements);
+  const elements = document.querySelectorAll(".form input[type=date]");
+  const selectElements = document.querySelectorAll(".form select")
+
+  return console.log(selectElements)
+
+  return validarCamposVacios(elements) && validarCamposVacios(selectElements)
 }
 
+/**
+ * Funcion que trae los datos de un mensaje por id
+ * @param {number} id de reservation
+ */
 async function obtenerElemento(id) {
   let response;
   try {
@@ -135,6 +159,7 @@ async function obtenerElemento(id) {
       type: "GET",
       dataType: DATAREQUEST.dataType,
     });
+    ID_RESERVATION = id;
     setCampos(response);
   } catch (error) {
     alert(`Hubo un problema trayendo los datos, Error: ${error.message}`);
@@ -153,10 +178,10 @@ async function traerDatos() {
       dataType: DATAREQUEST.dataType,
     });
     pintarElemento(response);
-    $("#id").attr("readonly", true);
     $("#startDate").val(getCurrentDate());
-    $("#startDate").attr("disabled", "disabled");
-    // $("#status").attr("disabled", "disabled");
+    $("#startDate").attr("disabled", true);
+    $("#status").val("Creado").attr("disabled", true);
+    // $("#status").attr("disabled", true);
     inputCloud();
     inputClient();
     return response;
@@ -165,20 +190,14 @@ async function traerDatos() {
   }
 }
 
-function elementoEnBD(datos, id) {
-  for (let element of datos) {
-    if (element.name === id) {
-      return element;
-    }
-  }
-  return null;
-}
-
+/**
+ * Funcion que asigna a un objeto los valores del formulario
+ * @param {String} typeMethod Metodo http que se va a realizar 
+ * @returns Objeto con los datos del formulario
+ */
 function organizarDatos(typeMethod) {
   const dataReservation = obtenerCampos();
-  const cloud = elementoEnBD(ELEMENTSDB_CLOUDS, dataReservation.cloud);
-  const client = elementoEnBD(ELEMENTSDB_CLIENTS, dataReservation.client);
-  console.log(dataReservation)
+  return console.log(dataReservation);
   let data;
   if (typeMethod === "post") {
     data = {
@@ -189,10 +208,13 @@ function organizarDatos(typeMethod) {
     };
   }
   if (typeMethod === "put") {
+    $("#status").attr("disabled", false);
+    $("#startDate").attr("disabled", false);
     data = {
-      idReservation: dataReservation.idReservation,
+      idReservation: ID_RESERVATION,
       startDate: dataReservation.startDate,
       devolutionDate: dataReservation.devolutionDate,
+      status: dataReservation.status,
       client: { idClient: client.idClient },
       cloud: { id: cloud.id },
     };
@@ -232,11 +254,13 @@ $("#btnCrear").click(function crear() {
  * despues limpia los campos del formulario y llama a
  * la funcion consultar para llenar la tabla con los datos actualizados
  */
- $("#btnActualizar").click(function actualizar() {
+$("#btnActualizar").click(function actualizar() {
   if (!validar()) {
     alert("Se deben llenar los campos.");
   } else {
     const data = organizarDatos("put");
+    console.log("===== Lo que se envia======");
+    console.log(data);
     $.ajax({
       url: DATAREQUEST.url + "/update",
       type: "PUT",
@@ -246,8 +270,10 @@ $("#btnCrear").click(function crear() {
       statusCode: {
         201: function () {
           alert("La operacion fue exitosa");
-          $("#cloud").attr("disabled", "");
-          $("#client").attr("disabled", "");
+          const cloud = document.getElementById("cloud");
+          cloud.setAttribute("disabled", false);
+          const client = document.getElementById("client");
+          client.setAttribute("disabled", false);
           limiparCampos();
           traerDatos();
         },

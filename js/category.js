@@ -67,7 +67,7 @@ function obtenerCampos() {
 
 /**
  * Funcion que asigna a los campos del formulario los datos entregados
- * @param {Object} data
+ * @param {Object} data data traida de la base de datos
  */
 function setCampos(data) {
   $("#name").val(data.name);
@@ -82,6 +82,10 @@ function setCampos(data) {
   return validarCamposVacios(elements);
 }
 
+/**
+ * Funcion que trae los datos de una categoria por id
+ * @param {number} id de categoria
+ */
 async function obtenerElemento(id) {
   let response;
   try {
@@ -109,7 +113,6 @@ async function traerDatos() {
       dataType: DATAREQUEST.dataType,
     });
     pintarElemento(response);
-    ELEMENTOSDB = response;
     return response;
   } catch (error) {
     alert(`Hubo un problema trayendo los datos, Error: ${error.message}`);
@@ -117,9 +120,7 @@ async function traerDatos() {
 }
 
 /**
- * Funcion para crear un nuevo campo a la tabla CLOUD
- * despues limpia los campos del formulario y llama a
- * la funcion consultar para llenar la tabla con los datos actualizados
+ * Funcion para crear un nuevo campo a la tabla CATEGORY
  */
 $("#btnCrear").click(function crear() {
   if (!validar()) {
@@ -130,7 +131,6 @@ $("#btnCrear").click(function crear() {
       name: newData.name,
       description: newData.description,
     };
-    // return console.log(data);
     $.ajax({
       url: DATAREQUEST.url + "/save",
       type: "POST",
@@ -149,9 +149,7 @@ $("#btnCrear").click(function crear() {
 });
 
 /**
- * Funcion para actualizar dato de CLOUD
- * despues limpia los campos del formulario y llama a
- * la funcion consultar para llenar la tabla con los datos actualizados
+ * Funcion para actualizar dato de CATEGORY
  */
 $("#btnActualizar").click(function actualizar() {
   if (!validar()) {
@@ -161,8 +159,7 @@ $("#btnActualizar").click(function actualizar() {
     const data = {
       id: ID_CATEGORY,
       name: dataCategory.name,
-      description: dataCategory.description,
-      // cloud: [],
+      description: dataCategory.description
     }; // Se crea un objeto con los datos a actualizar.
     $.ajax({
       url: DATAREQUEST.url + "/update",
@@ -183,9 +180,7 @@ $("#btnActualizar").click(function actualizar() {
 
 /**
  * Funcion para eliminar dato de CLOUD
- * si la respuesta es 204, llama a la funcion consultar
- * para traer los datos actualizados
- * @param {name} name nombre del elemento a eliminar
+ * @param {id} id del elemento a eliminar
  */
 function eliminar(id) {
   const r = confirm("Segur@ de eliminar la categoria"); // Se pregunta si está seguro de eliminar.
@@ -207,7 +202,7 @@ function eliminar(id) {
 
 /**
  * Cuando el HTML carga manda a llamar a la funcion
- * consultar para trear los datos del servicio REST
+ * traerDatos para trear los datos del servicio REST
  */
 $(document).ready(function () {
   traerDatos();

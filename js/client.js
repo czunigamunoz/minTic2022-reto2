@@ -91,7 +91,7 @@ function obtenerCampos() {
 
 /**
  * Funcion que asigna a los campos del formulario los datos entregados
- * @param {Object} data
+ * @param {Object} data data traida de la base de datos
  */
 function setCampos(data) {
   $("#name").val(data.name);
@@ -109,8 +109,8 @@ function validar() {
 }
 
 /**
- * Funcion que determina el elemento a ser editado o eliminado
- * @param {Event} event evento click en editar y eliminar
+ * Funcion que trae los datos de un cliente por id
+ * @param {number} id de cliente
  */
 async function obtenerElemento(id) {
   let response;
@@ -147,9 +147,7 @@ async function traerDatos() {
 }
 
 /**
- * Funcion para crear un nuevo campo a la tabla CLOUD
- * despues limpia los campos del formulario y llama a
- * la funcion consultar para llenar la tabla con los datos actualizados
+ * Funcion para crear un nuevo campo a la tabla CLIENT
  */
 $("#btnCrear").click(function crear() {
     console.log(validar())
@@ -175,9 +173,7 @@ $("#btnCrear").click(function crear() {
 });
 
 /**
- * Funcion para actualizar dato de CLOUD
- * despues limpia los campos del formulario y llama a
- * la funcion consultar para llenar la tabla con los datos actualizados
+ * Funcion para actualizar dato de CLIENT
  */
 $("#btnActualizar").click(function actualizar() {
   if (!validar()) {
@@ -210,10 +206,8 @@ $("#btnActualizar").click(function actualizar() {
 });
 
 /**
- * Funcion para eliminar dato de CLOUD
- * si la respuesta es 204, llama a la funcion consultar
- * para traer los datos actualizados
- * @param {name} name nombre del elemento a eliminar
+ * Funcion para eliminar dato de CLIENT
+ * @param {id} id del elemento a eliminar
  */
 function eliminar(id) {
   const r = confirm("Segur@ de eliminar el cliente"); // Se pregunta si está seguro de eliminar.

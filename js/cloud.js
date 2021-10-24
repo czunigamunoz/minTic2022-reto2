@@ -4,7 +4,6 @@ const DATAREQUEST = {
   "contentType": "application/json; charset=utf-8",
 }
 let ID_CLOUD = null;
-let ELEMENTSDB_CATEGORY = null;
 
 /**
  * Funcion que limpia los campos del formulario
@@ -17,6 +16,10 @@ function limiparCampos() {
   $("#category").val("");
 }
 
+/**
+ * Funcion que pinta el contenido de la tabla
+ * @param {Response} response
+ */
 function pintarElemento(response) {
   $("#contenidoTabla").empty();
   response.forEach((element) => {
@@ -92,16 +95,22 @@ function pintarElemento(response) {
 
 /**
  * Funcion que asigna a los campos del formulario los datos entregados
- * @param {Object} data 
+ * @param {Object} data data traida de la base de datos
  */
 function setCampos(data) {
   $("#name").val(data.name);
   $("#brand").val(data.brand);
   $("#year").val(data.year);
   $("#description").val(data.description);
-  $("#category").val(data.category.name).attr("disabled","disabled");
+  const category = document.getElementById("category");
+  category.selectedIndex = data.category.id;
+  category.setAttribute("disabled", true);
 }
 
+/**
+ * Funcion que trae todos los elementos de la tabla CATEGORY
+ * y los pinta en el select de category
+ */
 async function inputCategory(){
   const categories = await $.ajax({
     url: "http://localhost:8080/api/Category/all",
@@ -112,7 +121,7 @@ async function inputCategory(){
   for (let i = 0; i < categories.length; i++) {
     let option = document.createElement("option")
     option.setAttribute("class", "select-item")
-    option.value = categories[i].name
+    option.value = categories[i].id
     option.text = categories[i].name
     $("#category").append(option)
   }
@@ -127,8 +136,8 @@ async function inputCategory(){
 }
 
 /**
- * Funcion que determina el elemento a ser editado o eliminado
- * @param {Event} event evento click en editar y eliminar
+ * Funcion que trae los datos de una cloud por id
+ * @param {number} id de cloud
  */
 async function obtenerElemento(id) {
   let response;
@@ -157,31 +166,25 @@ async function obtenerElemento(id) {
       dataType: DATAREQUEST.dataType,
     });
     pintarElemento(response);
-    ELEMENTOSDB = response;
     return response;
   } catch (error) {
     alert(`Hubo un problema trayendo los datos, Error: ${error.message}`);
   }
 }
 
-function elementoEnBD(datos, name){
-  for (let element of datos){
-    if (element.name === name){
-      return element;
-    }
-  }
-}
-
-
+/**
+ * Funcion que asigna a un objeto los valores del formulario
+ * @param {String} typeMethod Metodo http que se va a realizar 
+ * @returns Objeto con los datos del formulario
+ */
 function organizarDatos(typeMethod){
   const dataCloud = obtenerCampos();
-  const category = elementoEnBD(ELEMENTSDB_CATEGORY, dataCloud.category)
   let data
   if (typeMethod === "post"){
     data = {
       brand: dataCloud.brand,
       year: parseInt(dataCloud.year),
-      category: {"id": category.id},
+      category: {"id": Number.parseInt(dataCloud.category)},
       name: dataCloud.name,      
       description: dataCloud.description,  
     }
@@ -193,7 +196,7 @@ function organizarDatos(typeMethod){
       name: dataCloud.name,
       year: parseInt(dataCloud.year),
       description: dataCloud.description,
-      category: {"id": category.id},
+      category: {"id": Number.parseInt(dataCloud.category)},
     }
   }
   return data;  
@@ -201,8 +204,6 @@ function organizarDatos(typeMethod){
 
 /**
  * Funcion para crear un nuevo campo a la tabla CLOUD
- * despues limpia los campos del formulario y llama a
- * la funcion consultar para llenar la tabla con los datos actualizados
  */
 $("#btnCrear").click(function crear() {
   if (!validar()) {
@@ -228,8 +229,6 @@ $("#btnCrear").click(function crear() {
 
 /**
  * Funcion para actualizar dato de CLOUD
- * despues limpia los campos del formulario y llama a
- * la funcion consultar para llenar la tabla con los datos actualizados
  */
 $("#btnActualizar").click(function actualizar() {
   if (!validar()) {
@@ -245,7 +244,8 @@ $("#btnActualizar").click(function actualizar() {
       statusCode: {
         201: function () {
           alert("La operacion fue exitosa");
-          $("#category").attr("disabled", "")
+          const category = document.getElementById("category");
+          category.setAttribute("disabled", false);
           limiparCampos();
           traerDatos();
         },
@@ -256,9 +256,7 @@ $("#btnActualizar").click(function actualizar() {
 
 /**
  * Funcion para eliminar dato de CLOUD
- * si la respuesta es 204, llama a la funcion consultar
- * para traer los datos actualizados
- * @param {name} name nombre del elemento a eliminar
+ * @param {id} id del elemento a eliminar
  */
  function eliminar(id) {
   const r = confirm(
