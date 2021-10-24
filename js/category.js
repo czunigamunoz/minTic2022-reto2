@@ -1,19 +1,9 @@
 const DATAREQUEST = {
-  'url': 'http://localhost:8080/api/Category',
-  'dataType': 'json',
-  "contentType": "application/json; charset=utf-8",
-}
-let ELEMENTOSDB = null;
-let ELEMENT = null;
-const propCategoria = {
-  "name": "",
-  "description": "",
-  "clouds": ""
-}
-
-/**
- *  1:41 Min 
- */
+  url: "http://localhost:8080/api/Category",
+  dataType: "json",
+  contentType: "application/json; charset=utf-8",
+};
+let ID_CATEGORY = null;
 
 /**
  * Funcion que limpia los campos del formulario
@@ -25,12 +15,40 @@ function limiparCampos() {
 
 /**
  * Funcion que pinta el contenido de la tabla
- * @param {Response} response 
+ * @param {Response} response
  */
 function pintarElemento(response) {
   $("#contenidoTabla").empty();
-  const rows = crearElemento(response, propCategoria);
-  rows.forEach((row) => {
+  response.forEach((element) => {
+    let row = $("<tr>");
+    row.append($("<td>").text(element.name));
+    row.append($("<td>").text(element.description));
+
+    const col = document.createElement("td");
+    let divContainer = document.createElement("div");
+    divContainer.setAttribute("class", "select-container");
+    let selectForm = document.createElement("select");
+    selectForm.setAttribute("class", "select-item");
+
+    element.clouds.forEach((cloud) => {
+      let option = document.createElement("option");
+      option.value = cloud.name;
+      option.text =  cloud.name;
+      selectForm.append(option);
+    });
+    divContainer.appendChild(selectForm);
+    col.append(divContainer);
+    row.append(col);
+    row.append(
+      $("<td class='text-center no-padding'>").append(
+        `<button type="button" class="btn btn-outline-warning btn-block w-100" onclick="obtenerElemento(${element.id})">Editar</button>`
+      )
+    );
+    row.append(
+      $("<td class='text-center'>").append(
+        `<button type="button" class="btn btn-outline-danger btn-block w-100" onclick="eliminar(${element.id})">Eliminar</button>`
+      )
+    );
     $("#contenidoTabla").append(row);
   });
 }
@@ -39,7 +57,7 @@ function pintarElemento(response) {
  * Funcion que guarda en un objeto los campos del formulario
  * @returns Objeto con los datos del formulario
  */
- function obtenerCampos() {
+function obtenerCampos() {
   const data = {
     name: $("#name").val(),
     description: $("#description").val(),
@@ -49,7 +67,7 @@ function pintarElemento(response) {
 
 /**
  * Funcion que asigna a los campos del formulario los datos entregados
- * @param {Object} data 
+ * @param {Object} data
  */
 function setCampos(data) {
   $("#name").val(data.name);
@@ -64,32 +82,19 @@ function setCampos(data) {
   return validarCamposVacios(elements);
 }
 
-/**
- * Funcion que determina el elemento a ser editado o eliminado
- * @param {Event} event evento click en editar y eliminar
- */
-async function obtenerElemento(event) {
-  const btn = event.target;
-  const nameElement = btn.parentElement.parentElement.firstChild.innerHTML;
-  const elemento = elementoEnBD(ELEMENTOSDB, nameElement)
-  if (!elemento) {
-    alert("Error: " + nameElement + " no encontrado en DB")
+async function obtenerElemento(id) {
+  let response;
+  try {
+    response = await $.ajax({
+      url: DATAREQUEST.url + `/${id}`,
+      type: "GET",
+      dataType: DATAREQUEST.dataType,
+    });
+    ID_CATEGORY = id;
+    setCampos(response);
+  } catch (error) {
+    alert(`Hubo un problema trayendo los datos, Error: ${error.message}`);
   }
-  ELEMENT = elemento;
-  if (btn.textContent === "Editar"){
-    setCampos(elemento);
-  } else {
-    eliminar(elemento.name)
-  }
-}
-
-function elementoEnBD(datos, name){
-  for (let element of datos){
-    if (element.name === name){
-      return element;
-    }
-  }
-  return null;
 }
 
 /**
@@ -104,6 +109,7 @@ async function traerDatos() {
       dataType: DATAREQUEST.dataType,
     });
     pintarElemento(response);
+    ELEMENTOSDB = response;
     return response;
   } catch (error) {
     alert(`Hubo un problema trayendo los datos, Error: ${error.message}`);
@@ -119,15 +125,21 @@ $("#btnCrear").click(function crear() {
   if (!validar()) {
     alert("Se deben llenar los campos.");
   } else {
-    const dataCategory = JSON.stringify(obtenerCampos());
+    const newData = obtenerCampos();
+    const data = {
+      name: newData.name,
+      description: newData.description,
+    };
+    // return console.log(data);
     $.ajax({
       url: DATAREQUEST.url + "/save",
       type: "POST",
       dataType: DATAREQUEST.dataType,
-      data: dataCategory,
+      data: JSON.stringify(data),
       contentType: DATAREQUEST.contentType,
       statusCode: {
         201: function () {
+          alert("Se agrego de manera exitosa");
           limiparCampos();
           traerDatos();
         },
@@ -142,16 +154,15 @@ $("#btnCrear").click(function crear() {
  * la funcion consultar para llenar la tabla con los datos actualizados
  */
 $("#btnActualizar").click(function actualizar() {
-  console.log("Hola")
   if (!validar()) {
     alert("Se deben llenar los campos.");
   } else {
     const dataCategory = obtenerCampos();
     const data = {
-      id: ELEMENT.id,
+      id: ID_CATEGORY,
       name: dataCategory.name,
       description: dataCategory.description,
-      cloud: [],
+      // cloud: [],
     }; // Se crea un objeto con los datos a actualizar.
     $.ajax({
       url: DATAREQUEST.url + "/update",
@@ -168,7 +179,7 @@ $("#btnActualizar").click(function actualizar() {
       },
     });
   }
-})
+});
 
 /**
  * Funcion para eliminar dato de CLOUD
@@ -176,14 +187,12 @@ $("#btnActualizar").click(function actualizar() {
  * para traer los datos actualizados
  * @param {name} name nombre del elemento a eliminar
  */
- function eliminar(name) {
-  const r = confirm(
-    "Segur@ de eliminar la categoria con nombre: " + name
-  ); // Se pregunta si está seguro de eliminar.
+function eliminar(id) {
+  const r = confirm("Segur@ de eliminar la categoria"); // Se pregunta si está seguro de eliminar.
   if (r == true) {
     //Si está seguro, se procede a eliminar.
     $.ajax({
-      url: DATAREQUEST.url + `/${ELEMENT.id}`,
+      url: DATAREQUEST.url + `/${id}`,
       type: "DELETE",
       dataType: DATAREQUEST.dataType,
       contentType: DATAREQUEST.contentType,
@@ -201,5 +210,5 @@ $("#btnActualizar").click(function actualizar() {
  * consultar para trear los datos del servicio REST
  */
 $(document).ready(function () {
-  traerDatos()
+  traerDatos();
 });

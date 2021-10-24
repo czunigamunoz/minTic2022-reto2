@@ -3,16 +3,9 @@ const DATAREQUEST = {
   dataType: "json",
   contentType: "application/json; charset=utf-8",
 };
-let ELEMENTOSDB = null;
-let ELEMENT = null;
+let ID_MESSAGE = null;
 let ELEMENTSDB_CLOUDS = null;
 let ELEMENTSDB_CLIENTS = null;
-const TABLA = "category"
-const propMessage = {
-  "messageText": "",
-  "cloud": "",
-  "client": ""
-}
 
 async function inputCloud(){
   const clouds = await $.ajax({
@@ -50,8 +43,7 @@ async function inputClient(){
  * Funcion que limpia los campos del formulario
  */
 function limiparCampos() {
-  $("#name").val("");
-  $("#description").val("");
+  $("#messageText").val("");
 }
 
 /**
@@ -60,8 +52,22 @@ function limiparCampos() {
  */
 function pintarElemento(response) {
   $("#contenidoTabla").empty();
-  const rows = crearElemento(response, propMessage);
-  rows.forEach((row) => {
+  response.forEach((element) => {
+    let row = $("<tr>");
+    row.append($("<td>").text(element.messageText));
+    row.append($("<td>").text(element.cloud.name));
+    row.append($("<td>").text(element.client.name));
+
+    row.append(
+      $("<td class='text-center no-padding'>").append(
+        `<button type="button" class="btn btn-outline-warning btn-block w-100" onclick="obtenerElemento(${element.idMessage})">Editar</button>`
+      )
+    );
+    row.append(
+      $("<td class='text-center'>").append(
+        `<button type="button" class="btn btn-outline-danger btn-block w-100" onclick="eliminar(${element.idMessage})">Eliminar</button>`
+      )
+    );
     $("#contenidoTabla").append(row);
   });
 }
@@ -84,7 +90,6 @@ function obtenerCampos() {
  * @param {Object} data
  */
 function setCampos(data) {
-  console.log(data);
   $("#messageText").val(data.messageText);
   $("#cloud").val(data.cloud.name).attr("disabled","disabled");
   $("#client").val(data.client.name).attr("disabled","disabled");
@@ -94,34 +99,18 @@ function setCampos(data) {
  * Funcion que determina el elemento a ser editado o eliminado
  * @param {Event} event evento click en editar y eliminar
  */
-async function obtenerElemento(event) {
-  const btn = event.target;
-  const messageText = btn.parentElement.parentElement.firstChild.innerHTML;
-  const elemento = messageEnBD(ELEMENTOSDB, messageText);
-  if (!elemento) {
-    alert("Error: " + messageText + " no encontrado en DB");
-  }
-  ELEMENT = elemento;
-  if (btn.textContent === "Editar") {
-    setCampos(elemento);
-  } else {
-    eliminar(elemento.messageText);
-  }
-}
-
-function messageEnBD(datos, data) {
-  for (let element of datos) {
-    if (element.messageText === data) {
-      return element;
-    }
-  }
-}
-
-function elementoEnBD(datos, data) {
-  for (let element of datos) {
-    if (element.name === data) {
-      return element;
-    }
+async function obtenerElemento(id) {
+  let response;
+  try {
+    response = await $.ajax({
+      url: DATAREQUEST.url + `/${id}`,
+      type: "GET",
+      dataType: DATAREQUEST.dataType,
+    });
+    ID_MESSAGE = id;
+    setCampos(response);
+  } catch (error) {
+    alert(`Hubo un problema trayendo los datos, Error: ${error.message}`);
   }
 }
 
@@ -144,6 +133,22 @@ async function traerDatos() {
   }
 }
 
+function messageEnBD(datos, data) {
+  for (let element of datos) {
+    if (element.messageText === data) {
+      return element;
+    }
+  }
+}
+
+function elementoEnBD(datos, data) {
+  for (let element of datos) {
+    if (element.name === data) {
+      return element;
+    }
+  }
+}
+
 function organizarDatos(typeMethod){
   const dataMessage = obtenerCampos();
   const cloud = elementoEnBD(ELEMENTSDB_CLOUDS, dataMessage.cloud)
@@ -158,7 +163,7 @@ function organizarDatos(typeMethod){
   }
   if (typeMethod === "put"){
     data = {
-      idMessage: ELEMENT.idMessage,
+      idMessage: ID_MESSAGE,
       messageText: dataMessage.messageText,
       client: {"idClient": client.idClient},
       cloud: {"id": cloud.id},
@@ -186,6 +191,7 @@ $("#btnCrear").click(function crear() {
       contentType: DATAREQUEST.contentType,
       statusCode: {
         201: function () {
+          alert("Se agrego la nube exitosamente");
           limiparCampos();
           traerDatos();
         },
@@ -229,17 +235,17 @@ $("#btnActualizar").click(function actualizar() {
  * para traer los datos actualizados
  * @param {name} name nombre del elemento a eliminar
  */
-function eliminar(message) {
-  const r = confirm("Segur@ de eliminar el mensaje: " + message); // Se pregunta si está seguro de eliminar.
+function eliminar(id) {
+  const r = confirm("Segur@ de eliminar el mensaje");
   if (r == true) {
-    //Si está seguro, se procede a eliminar.
     $.ajax({
-      url: DATAREQUEST.url + `/${ELEMENT.idMessage}`,
+      url: DATAREQUEST.url + `/${id}`,
       type: "DELETE",
       dataType: DATAREQUEST.dataType,
       contentType: DATAREQUEST.contentType,
       statusCode: {
         204: function () {
+          alert("Se elimino el mensaje exitosamente");
           traerDatos();
         },
       },

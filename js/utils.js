@@ -42,6 +42,7 @@ function validarCampoEdad(entrada) {
 function crearElemento(response, properties) {
 
   const rows = [];
+  let ID = null;
 
   for (let index = 0; index < Object.entries(response).length; index++) {
 
@@ -56,7 +57,13 @@ function crearElemento(response, properties) {
         if (typeof elementTemp[prop] === "string" || typeof elementTemp[prop] === "number") {
           properties[prop] = elementTemp[prop];
 
-          col.appendChild(document.createTextNode(properties[prop]));
+          if (typeof properties[prop] === "string" && properties[prop].includes('+')){
+              const date = properties[prop].split('T')[0]
+              col.appendChild(document.createTextNode(date));
+          } else {
+            col.appendChild(document.createTextNode(properties[prop]));
+          }
+          
           row.appendChild(col);
         } else {
 
@@ -70,11 +77,10 @@ function crearElemento(response, properties) {
 
             try {
               elementTemp[prop].forEach((subProp) => {
-                // console.log(subProp);
 
                 let option = document.createElement("option");
-                option.value = subProp.name ?? subProp.messageText ?? subProp.idReservation;
-                option.text = subProp.name ?? subProp.messageText ?? subProp.idReservation;
+                option.value = subProp.name ?? subProp.messageText ?? subProp.idReservation
+                option.text = subProp.name ?? subProp.messageText ?? subProp.idReservation
                 selectForm.appendChild(option);
               
               });
@@ -84,11 +90,13 @@ function crearElemento(response, properties) {
               row.appendChild(col);
 
             } catch (e) {
-              properties[prop] = elementTemp[prop].name;
+              
+              properties[prop] = elementTemp[prop];
+
 
               let option = document.createElement("option");
-              option.value = elementTemp[prop].name;
-              option.text = elementTemp[prop].name;
+              option.value = properties[prop].name;
+              option.text = properties[prop].name;
               selectForm.appendChild(option);
               divContainer.appendChild(selectForm);
               col.appendChild(divContainer);
@@ -99,21 +107,24 @@ function crearElemento(response, properties) {
       }
     }
 
-    console.log(properties);
+    const id = properties.id ?? properties.idClient ?? properties.idReservation ?? properties.idMessage ?? properties.idAdmin;
+
+    console.log(properties)
+    console.log(id)
 
     const col = document.createElement("td");
     col.setAttribute("class", "text-center p-2");
     const btnEditar = document.createElement("button");
     btnEditar.setAttribute("class", "btn btn-outline-warning btn-block w-50");
     btnEditar.textContent = "Editar";
-    btnEditar.setAttribute("onclick", "obtenerElemento(event)");
+    btnEditar.setAttribute("onclick", `obtenerElemento(${id})`);
     const btnEliminar = document.createElement("button");
     btnEliminar.setAttribute(
       "class",
       "btn btn-outline-danger btn-block w-50 btn-eliminar"
     );
     btnEliminar.textContent = "Eliminar";
-    btnEliminar.setAttribute("onclick", "obtenerElemento(event)");
+    btnEliminar.setAttribute("onclick", `eliminar(${id})`);
     col.appendChild(btnEditar);
     col.appendChild(btnEliminar);
     row.appendChild(col);

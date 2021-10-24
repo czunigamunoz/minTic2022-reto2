@@ -19,6 +19,9 @@
             <table class="table table-borderless">
                 <thead>
                     <tr>
+                        <th>Id</th>
+                        <th>Start Date</th>
+                        <th>Devolution Date</th>
                         <th>Status</th>
                         <th>Cloud</th>
                         <th>Client</th>
@@ -33,24 +36,37 @@
         <br />
         <div class="row">
             <div class="col-2">
-                <label for="status">Status</label>
-                <input class="form-control form-control-sm" type="text" placeholder="Status" id="status">
+                <label for="id">Id</label>
+                <input class="form-control form-control-sm" type="number" placeholder="Id" id="id">
             </div>
             <div class="col-2">
                 <label for="fechaInicio">Fecha Inicio</label>
-                <input class="form-control form-control-sm" type="date" placeholder="fechaInicio" id="fechaInicio">
+                <input class="form-control form-control-sm" type="date" placeholder="fechaInicio" id="startDate">
             </div>
             <div class="col-2">
                 <label for="fechaFinal">Fecha Final</label>
-                <input class="form-control form-control-sm" type="date" placeholder="fechaFinal" id="fechaFinal">
+                <input class="form-control form-control-sm" type="date" placeholder="fechaFinal" id="devolutionDate">
             </div>
             <div class="col-2">
-                <label for="client">Client</label>
-                <input class="form-control form-control-sm" type="number" placeholder="Client" id="client">
-            </div>
+                <label for="status">Status</label>
+                <select id="status" class="select-container">
+                    <option value="Creado">Creado</option>                    
+                    <option value="Programado">Programado</option>
+                    <option value="Cancelado">Cancelado</option>
+                    <option value="Realizado">Realizado</option>
+                </select>
+            </div>        
             <div class="col-2">
                 <label for="cloud">Cloud</label>
-                <input class="form-control form-control-sm" type="text" placeholder="Cloud" id="cloud">
+                <select id="cloud" class="select-container">
+
+                </select>
+            </div>           
+            <div class="col-2">
+                <label for="client">Client</label>
+                <select id="client" class="select-container">
+
+                </select>
             </div>
         </div>
         <br />
