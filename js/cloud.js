@@ -1,8 +1,8 @@
 const DATAREQUEST = {
-  'url': 'http://localhost:8080/api/Cloud',
-  'dataType': 'json',
-  "contentType": "application/json; charset=utf-8",
-}
+  url: "http://localhost:8080/api/Cloud",
+  dataType: "json",
+  contentType: "application/json; charset=utf-8",
+};
 let ID_CLOUD = null;
 
 /**
@@ -39,7 +39,7 @@ function pintarElemento(response) {
     element.messages.forEach((message) => {
       let option = document.createElement("option");
       option.value = message.messageText;
-      option.text =  message.messageText;
+      option.text = message.messageText;
       selectMessage.append(option);
     });
     divMessages.appendChild(selectMessage);
@@ -51,19 +51,17 @@ function pintarElemento(response) {
     divReservations.setAttribute("class", "select-container");
     let selectReservation = document.createElement("select");
     selectReservation.setAttribute("class", "select-item");
-    
 
     element.reservations.forEach((reservation) => {
       let option = document.createElement("option");
       option.value = reservation.idReservation;
-      option.text =  reservation.idReservation;
+      option.text = reservation.idReservation;
       selectReservation.append(option);
     });
     divReservations.appendChild(selectReservation);
     colReservation.append(divReservations);
     row.append(colReservation);
 
-    
     row.append(
       $("<td class='text-center no-padding'>").append(
         `<button type="button" class="btn btn-outline-warning btn-block w-100" onclick="obtenerElemento(${element.id})">Editar</button>`
@@ -82,7 +80,7 @@ function pintarElemento(response) {
  * Funcion que guarda en un objeto los campos del formulario
  * @returns Objeto con los datos del formulario
  */
- function obtenerCampos() {
+function obtenerCampos() {
   const data = {
     name: $("#name").val(),
     brand: $("#brand").val(),
@@ -111,26 +109,26 @@ function setCampos(data) {
  * Funcion que trae todos los elementos de la tabla CATEGORY
  * y los pinta en el select de category
  */
-async function inputCategory(){
+async function inputCategory() {
   const categories = await $.ajax({
     url: "http://localhost:8080/api/Category/all",
     type: "GET",
-    dataType: DATAREQUEST.dataType
+    dataType: DATAREQUEST.dataType,
   });
   ELEMENTSDB_CATEGORY = categories;
   for (let i = 0; i < categories.length; i++) {
-    let option = document.createElement("option")
-    option.setAttribute("class", "select-item")
-    option.value = categories[i].id
-    option.text = categories[i].name
-    $("#category").append(option)
+    let option = document.createElement("option");
+    option.setAttribute("class", "select-item");
+    option.value = categories[i].id;
+    option.text = categories[i].name;
+    $("#category").append(option);
   }
 }
 
 /**
  * Funcion para validar que los campos no esten vacios
  */
- function validar() {
+function validar() {
   const elements = document.querySelectorAll(".form input");
   return validarCamposVacios(elements);
 }
@@ -157,7 +155,7 @@ async function obtenerElemento(id) {
 /**
  * Funcion que hace peticion GET al servicio REST
  */
- async function traerDatos() {
+async function traerDatos() {
   let response;
   try {
     response = await $.ajax({
@@ -174,32 +172,32 @@ async function obtenerElemento(id) {
 
 /**
  * Funcion que asigna a un objeto los valores del formulario
- * @param {String} typeMethod Metodo http que se va a realizar 
+ * @param {String} typeMethod Metodo http que se va a realizar
  * @returns Objeto con los datos del formulario
  */
-function organizarDatos(typeMethod){
+function organizarDatos(typeMethod) {
   const dataCloud = obtenerCampos();
-  let data
-  if (typeMethod === "post"){
+  let data;
+  if (typeMethod === "post") {
     data = {
       brand: dataCloud.brand,
       year: parseInt(dataCloud.year),
-      category: {"id": Number.parseInt(dataCloud.category)},
-      name: dataCloud.name,      
-      description: dataCloud.description,  
-    }
+      category: { id: Number.parseInt(dataCloud.category) },
+      name: dataCloud.name,
+      description: dataCloud.description,
+    };
   }
-  if (typeMethod === "put"){
+  if (typeMethod === "put") {
     data = {
       id: ID_CLOUD,
       brand: dataCloud.brand,
       name: dataCloud.name,
       year: parseInt(dataCloud.year),
       description: dataCloud.description,
-      category: {"id": Number.parseInt(dataCloud.category)},
-    }
+      category: { id: Number.parseInt(dataCloud.category) },
+    };
   }
-  return data;  
+  return data;
 }
 
 /**
@@ -208,6 +206,19 @@ function organizarDatos(typeMethod){
 $("#btnCrear").click(function crear() {
   if (!validar()) {
     alert("Se deben llenar los campos.");
+  } else if (
+    !validarMenor45Caracteres($("#name").val())) {
+    alert("Campo name no debe tener mas de 45 caracteres");
+  } 
+  else if (
+    !validarMenor45Caracteres($("#brand").val())) {
+    alert("Campo brand no debe tener mas de 45 caracteres");
+  } 
+  else if (!validarAnio($("#year"))){
+    alert("Campo year debe ser un entero de 4 digitos");
+  }
+  else if (!validarMenor250Caracteres($("#description"))){
+    alert("Campo description no debe tener mas de 250 caracteres");
   } else {
     const data = organizarDatos("post");
     $.ajax({
@@ -233,6 +244,19 @@ $("#btnCrear").click(function crear() {
 $("#btnActualizar").click(function actualizar() {
   if (!validar()) {
     alert("Se deben llenar los campos.");
+  } else if (
+    !validarMenor45Caracteres($("#name").val())) {
+    alert("Campo name no debe tener mas de 45 caracteres");
+  } 
+  else if (
+    !validarMenor45Caracteres($("#brand").val())) {
+    alert("Campo brand no debe tener mas de 45 caracteres");
+  } 
+  else if (!validarAnio($("#year"))){
+    alert("Campo year debe ser un entero de 4 digitos");
+  }
+  else if (!validarMenor250Caracteres($("#description"))){
+    alert("Campo description no debe tener mas de 250 caracteres");
   } else {
     const data = organizarDatos("put");
     $.ajax({
@@ -252,16 +276,14 @@ $("#btnActualizar").click(function actualizar() {
       },
     });
   }
-})
+});
 
 /**
  * Funcion para eliminar dato de CLOUD
  * @param {id} id del elemento a eliminar
  */
- function eliminar(id) {
-  const r = confirm(
-    "Segur@ de eliminar la Cloud"
-  ); // Se pregunta si está seguro de eliminar.
+function eliminar(id) {
+  const r = confirm("Segur@ de eliminar la Cloud"); // Se pregunta si está seguro de eliminar.
   if (r == true) {
     //Si está seguro, se procede a eliminar.
     $.ajax({
@@ -284,6 +306,6 @@ $("#btnActualizar").click(function actualizar() {
  * consultar para trear los datos del servicio REST
  */
 $(document).ready(function () {
-  traerDatos()
-  inputCategory()
+  traerDatos();
+  inputCategory();
 });

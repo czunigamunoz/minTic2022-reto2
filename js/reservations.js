@@ -24,6 +24,7 @@ function pintarElemento(response) {
   $("#contenidoTabla").empty();
   response.forEach((element) => {
     let row = $("<tr>");
+    row.append($("<td>").text(element.idReservation));
     row.append($("<td>").text(element.startDate.split("T")[0]));
     row.append($("<td>").text(element.devolutionDate.split("T")[0]));
     row.append($("<td>").text(element.status));
@@ -139,12 +140,20 @@ async function inputClient() {
  * Funcion para validar que los campos no esten vacios
  */
 function validar() {
-  const elements = document.querySelectorAll(".form input[type=date]");
+  const elements = document.querySelectorAll(".form input");
   const selectElements = document.querySelectorAll(".form select")
 
-  return console.log(selectElements)
-
   return validarCamposVacios(elements) && validarCamposVacios(selectElements)
+}
+
+/**
+ * Funcion para validar la fecha
+ * @param {Date} date1 Fecha de inicio
+ * @param {Date} date2 Fecha final
+ * @returns True si date2 es posterior a date1
+ */
+function validarFecha(date1, date2) {
+  return new Date(date2) > new Date(date1);
 }
 
 /**
@@ -197,14 +206,13 @@ async function traerDatos() {
  */
 function organizarDatos(typeMethod) {
   const dataReservation = obtenerCampos();
-  return console.log(dataReservation);
   let data;
   if (typeMethod === "post") {
     data = {
       startDate: dataReservation.startDate,
       devolutionDate: dataReservation.devolutionDate,
-      client: { idClient: client.idClient },
-      cloud: { id: cloud.id },
+      client: { idClient: Number.parseInt(dataReservation.client)},
+      cloud: { id: Number.parseInt(dataReservation.cloud)},
     };
   }
   if (typeMethod === "put") {
@@ -215,21 +223,22 @@ function organizarDatos(typeMethod) {
       startDate: dataReservation.startDate,
       devolutionDate: dataReservation.devolutionDate,
       status: dataReservation.status,
-      client: { idClient: client.idClient },
-      cloud: { id: cloud.id },
+      client: { idClient: Number.parseInt(dataReservation.client)},
+      cloud: { id: Number.parseInt(dataReservation.cloud)},
     };
   }
   return data;
 }
 
 /**
- * Funcion para crear un nuevo campo a la tabla CLOUD
- * despues limpia los campos del formulario y llama a
- * la funcion consultar para llenar la tabla con los datos actualizados
+ * Funcion para crear un nuevo campo a la tabla RESERVATION
  */
 $("#btnCrear").click(function crear() {
   if (!validar()) {
     alert("Se deben llenar los campos.");
+  } 
+  if (!validarFecha($("#startDate").val(), $("#devolutionDate").val())) {
+    alert("La fecha de inicio debe ser anterior a la fecha final")
   } else {
     const data = organizarDatos("post");
     $.ajax({
@@ -250,13 +259,14 @@ $("#btnCrear").click(function crear() {
 });
 
 /**
- * Funcion para actualizar dato de CLOUD
- * despues limpia los campos del formulario y llama a
- * la funcion consultar para llenar la tabla con los datos actualizados
+ * Funcion para actualizar dato de RESERVATION
  */
 $("#btnActualizar").click(function actualizar() {
   if (!validar()) {
     alert("Se deben llenar los campos.");
+  } 
+  if (!validarFecha($("#startDate").val(), $("#devolutionDate").val())) {
+    alert("La fecha de inicio debe ser anterior a la fecha final")
   } else {
     const data = organizarDatos("put");
     console.log("===== Lo que se envia======");
@@ -283,10 +293,8 @@ $("#btnActualizar").click(function actualizar() {
 });
 
 /**
- * Funcion para eliminar dato de CLOUD
- * si la respuesta es 204, llama a la funcion consultar
- * para traer los datos actualizados
- * @param {name} name nombre del elemento a eliminar
+ * Funcion para eliminar dato de RESERVATION
+ * @param {id} id del elemento a eliminar
  */
 function eliminar(id) {
   const r = confirm("Segur@ de eliminar la reserva"); // Se pregunta si está seguro de eliminar.

@@ -150,9 +150,21 @@ async function traerDatos() {
  * Funcion para crear un nuevo campo a la tabla CLIENT
  */
 $("#btnCrear").click(function crear() {
-    console.log(validar())
   if (!validar()) {
     alert("Se deben llenar los campos.");
+  } else if (
+    !validarMenor45Caracteres($("#email").val())) {
+    alert("Campo email no debe tener mas de 45 caracteres");
+  } 
+  else if (
+    !validarMenor45Caracteres($("#password").val())) {
+    alert("Campo password no debe tener mas de 45 caracteres");
+  } 
+  else if (!validarCampoEdad($("#age"))){
+    alert("Campo age debe ser un entero de entre 0 y 120");
+  }
+  else if (!validarMenor250Caracteres($("#name"))){
+    alert("Campo name no debe tener mas de 250 caracteres");
   } else {
     const dataCategory = JSON.stringify(obtenerCampos());
     $.ajax({
@@ -177,7 +189,20 @@ $("#btnCrear").click(function crear() {
  */
 $("#btnActualizar").click(function actualizar() {
   if (!validar()) {
-    return alert("Se deben llenar los campos.");
+    alert("Se deben llenar los campos.");
+  } else if (
+    !validarMenor45Caracteres($("#email").val())) {
+    alert("Campo email no debe tener mas de 45 caracteres");
+  } 
+  else if (
+    !validarMenor45Caracteres($("#password").val())) {
+    alert("Campo password no debe tener mas de 45 caracteres");
+  } 
+  else if (!validarCampoEdad($("#age"))){
+    alert("Campo age debe ser un entero de entre 0 y 120");
+  }
+  else if (!validarMenor250Caracteres($("#name"))){
+    alert("Campo name no debe tener mas de 250 caracteres");
   } else {
     const dataCategory = obtenerCampos();
     const data = {

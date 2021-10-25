@@ -79,6 +79,7 @@ function setCampos(data) {
  */
  function validar() {
   const elements = document.querySelectorAll(".form input");
+
   return validarCamposVacios(elements);
 }
 
@@ -125,6 +126,12 @@ async function traerDatos() {
 $("#btnCrear").click(function crear() {
   if (!validar()) {
     alert("Se deben llenar los campos.");
+  } 
+  else if (!validarMenor45Caracteres($("#name").val())) {
+    alert("Campo name no debe tener mas de 45 caracteres")
+  } 
+  else if (!validarMenor250Caracteres($("#description").val())) {
+    alert("Campo description no debe tener mas de 250 caracteres")
   } else {
     const newData = obtenerCampos();
     const data = {
@@ -154,6 +161,12 @@ $("#btnCrear").click(function crear() {
 $("#btnActualizar").click(function actualizar() {
   if (!validar()) {
     alert("Se deben llenar los campos.");
+  } 
+  else if (!validarMenor45Caracteres($("#name").val())) {
+    alert("Campo name no debe tener mas de 45 caracteres")
+  } 
+  else if (!validarMenor250Caracteres($("#description").val())) {
+    alert("Campo description no debe tener mas de 250 caracteres")
   } else {
     const dataCategory = obtenerCampos();
     const data = {

@@ -187,7 +187,10 @@ function organizarDatos(typeMethod){
 $("#btnCrear").click(function crear() {
   if (!validar()) {
     alert("Se deben llenar los campos.");
-  } else {
+  } else if (
+    !validarMenor250Caracteres($("#messageText").val())) {
+    alert("Campo message no debe tener mas de 250 caracteres");
+  }  else {
     const data = organizarDatos("post");
     console.log(data);
     $.ajax({
@@ -213,7 +216,10 @@ $("#btnCrear").click(function crear() {
 $("#btnActualizar").click(function actualizar() {
   if (!validar()) {
     alert("Se deben llenar los campos.");
-  } else {
+  } else if (
+    !validarMenor250Caracteres($("#messageText").val())) {
+    alert("Campo message no debe tener mas de 250 caracteres");
+  }  else {
     const data = organizarDatos("put");
     $.ajax({
       url: DATAREQUEST.url + "/update",
