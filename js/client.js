@@ -160,10 +160,10 @@ $("#btnCrear").click(function crear() {
     !validarMenor45Caracteres($("#password").val())) {
     alert("Campo password no debe tener mas de 45 caracteres");
   } 
-  else if (!validarCampoEdad($("#age"))){
+  else if (!validarCampoEdad($("#age").val())){
     alert("Campo age debe ser un entero de entre 0 y 120");
   }
-  else if (!validarMenor250Caracteres($("#name"))){
+  else if (!validarMenor250Caracteres($("#name").val())){
     alert("Campo name no debe tener mas de 250 caracteres");
   } else {
     const dataCategory = JSON.stringify(obtenerCampos());
@@ -198,10 +198,10 @@ $("#btnActualizar").click(function actualizar() {
     !validarMenor45Caracteres($("#password").val())) {
     alert("Campo password no debe tener mas de 45 caracteres");
   } 
-  else if (!validarCampoEdad($("#age"))){
+  else if (!validarCampoEdad($("#age").val())){
     alert("Campo age debe ser un entero de entre 0 y 120");
   }
-  else if (!validarMenor250Caracteres($("#name"))){
+  else if (!validarMenor250Caracteres($("#name").val())){
     alert("Campo name no debe tener mas de 250 caracteres");
   } else {
     const dataCategory = obtenerCampos();

@@ -115,7 +115,6 @@ async function inputCategory() {
     type: "GET",
     dataType: DATAREQUEST.dataType,
   });
-  ELEMENTSDB_CATEGORY = categories;
   for (let i = 0; i < categories.length; i++) {
     let option = document.createElement("option");
     option.setAttribute("class", "select-item");
@@ -214,10 +213,10 @@ $("#btnCrear").click(function crear() {
     !validarMenor45Caracteres($("#brand").val())) {
     alert("Campo brand no debe tener mas de 45 caracteres");
   } 
-  else if (!validarAnio($("#year"))){
+  else if (!validarAnio($("#year").val())){
     alert("Campo year debe ser un entero de 4 digitos");
   }
-  else if (!validarMenor250Caracteres($("#description"))){
+  else if (!validarMenor250Caracteres($("#description").val())){
     alert("Campo description no debe tener mas de 250 caracteres");
   } else {
     const data = organizarDatos("post");
@@ -252,10 +251,10 @@ $("#btnActualizar").click(function actualizar() {
     !validarMenor45Caracteres($("#brand").val())) {
     alert("Campo brand no debe tener mas de 45 caracteres");
   } 
-  else if (!validarAnio($("#year"))){
+  else if (!validarAnio($("#year").val())){
     alert("Campo year debe ser un entero de 4 digitos");
   }
-  else if (!validarMenor250Caracteres($("#description"))){
+  else if (!validarMenor250Caracteres($("#description").val())){
     alert("Campo description no debe tener mas de 250 caracteres");
   } else {
     const data = organizarDatos("put");
