@@ -147,7 +147,7 @@ async function obtenerElemento(id) {
     ID_CLOUD = id;
     setCampos(response);
   } catch (error) {
-    alert(`Hubo un problema trayendo los datos, Error: ${error.message}`);
+    console.error(`Hubo un problema trayendo los datos, Error: ${error.message}`);
   }
 }
 

@@ -150,7 +150,7 @@ async function traerDatos() {
     pintarElemento(response);
     return response;
   } catch (error) {
-    alert(`Hubo un problema trayendo los datos, Error: ${error.message}`);
+    console.error(`Hubo un problema trayendo los datos, Error: ${error.message}`);
   }
 }
 
