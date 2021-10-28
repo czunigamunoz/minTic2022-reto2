@@ -28,38 +28,21 @@ function pintarElemento(response) {
     row.append($("<td>").text(element.name));
     row.append($("<td>").text(element.age));
 
-    const colMessage = document.createElement("td");
-    let divMessages = document.createElement("div");
-    divMessages.setAttribute("class", "select-container");
-    let selectMessage = document.createElement("select");
-    selectMessage.setAttribute("class", "select-item");
-
+    let divMessage = $("<div>").attr("class", "select-container");
+    let selectMessage = $("<select>").attr("class", "select-item");
     element.messages.forEach((message) => {
-      let option = document.createElement("option");
-      option.value = message.messageText;
-      option.text =  message.messageText;
-      selectMessage.append(option);
+      selectMessage.append(`<option value="${message.idMessage}"> ${message.messageText} </option>`);
     });
-    divMessages.appendChild(selectMessage);
-    colMessage.append(divMessages);
-    row.append(colMessage);
+    divMessage.append(selectMessage);
+    row.append($("<td>").append(divMessage));
 
-    const colReservation = document.createElement("td");
-    let divReservations = document.createElement("div");
-    divReservations.setAttribute("class", "select-container");
-    let selectReservation = document.createElement("select");
-    selectReservation.setAttribute("class", "select-item");
-    
-
+    let divReservation = $("<div>").attr("class", "select-container");
+    let selectReservation = $("<select>").attr("class", "select-item");
     element.reservations.forEach((reservation) => {
-      let option = document.createElement("option");
-      option.value = reservation.idReservation;
-      option.text =  reservation.idReservation;
-      selectReservation.append(option);
+      selectReservation.append(`<option value="${reservation.idReservation}"> ${reservation.idReservation} </option>`)
     });
-    divReservations.appendChild(selectReservation);
-    colReservation.append(divReservations);
-    row.append(colReservation);
+    divReservation.append(selectReservation);
+    row.append($("<td>").append(divReservation));
 
     row.append(
       $("<td class='text-center no-padding'>").append(

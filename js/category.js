@@ -24,21 +24,15 @@ function pintarElemento(response) {
     row.append($("<td>").text(element.name));
     row.append($("<td>").text(element.description));
 
-    const col = document.createElement("td");
-    let divContainer = document.createElement("div");
-    divContainer.setAttribute("class", "select-container");
-    let selectForm = document.createElement("select");
-    selectForm.setAttribute("class", "select-item");
-
+    let divCloud = $("<div>").attr("class", "select-container");
+    let selectCloud = $("<select>").attr("class", "select-item");
     element.clouds.forEach((cloud) => {
-      let option = document.createElement("option");
-      option.value = cloud.name;
-      option.text =  cloud.name;
-      selectForm.append(option);
+      console.log(cloud)
+      selectCloud.append(`<option value="${cloud.id}"> ${cloud.name} </option>`);
     });
-    divContainer.appendChild(selectForm);
-    col.append(divContainer);
-    row.append(col);
+    divCloud.append(selectCloud);
+    row.append($("<td>").append(divCloud));
+
     row.append(
       $("<td class='text-center no-padding'>").append(
         `<button type="button" class="btn btn-outline-warning btn-block w-100" onclick="obtenerElemento(${element.id})">Editar</button>`
