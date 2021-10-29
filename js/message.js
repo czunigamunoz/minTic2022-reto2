@@ -206,6 +206,9 @@ $("#btnCrear").click(function crear() {
           traerDatos();
         },
       },
+      error: function () {
+        alert("Error en crear message");
+      },
     });
   }
 });
@@ -238,6 +241,9 @@ $("#btnActualizar").click(function actualizar() {
           traerDatos();
         },
       },
+      error: function () {
+        alert("Error en actualizar message");
+      },
     });
   }
 });
@@ -259,6 +265,9 @@ function eliminar(id) {
           alert("Se elimino el mensaje exitosamente");
           traerDatos();
         },
+      },
+      error: function () {
+        alert("Error en eliminar message");
       },
     });
   }

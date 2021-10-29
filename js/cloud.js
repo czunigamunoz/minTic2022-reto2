@@ -218,6 +218,9 @@ $("#btnCrear").click(function crear() {
           traerDatos();
         },
       },
+      error: function () {
+        alert("Error en crear cloud");
+      },
     });
   }
 });
@@ -258,6 +261,9 @@ $("#btnActualizar").click(function actualizar() {
           traerDatos();
         },
       },
+      error: function () {
+        alert("Error en actualizar cloud");
+      },
     });
   }
 });
@@ -280,6 +286,9 @@ function eliminar(id) {
           alert("Se elimino cloud exitosamente");
           traerDatos();
         },
+      },
+      error: function () {
+        alert("Error en eliminar cloud");
       },
     });
   }

@@ -114,15 +114,13 @@ async function obtenerElemento(id) {
  * Funcion que hace peticion GET al servicio REST
  */
 async function traerDatos() {
-  let response;
   try {
-    response = await $.ajax({
+      const response = await $.ajax({
       url: DATAREQUEST.url + "/all",
       type: "GET",
       dataType: DATAREQUEST.dataType,
     });
     pintarElemento(response);
-    ELEMENTOSDB = response;
     return response;
   } catch (error) {
     console.error(`Hubo un problema trayendo los datos, Error: ${error.message}`);
@@ -163,6 +161,9 @@ $("#btnCrear").click(function crear() {
           traerDatos();
         },
       },
+      error: function () {
+        alert("Error en crear client");
+      }
     });
   }
 });
@@ -209,6 +210,9 @@ $("#btnActualizar").click(function actualizar() {
           traerDatos();
         },
       },
+      error: function () {
+        alert("Error en actualizar client");
+      }
     });
   }
 });
@@ -232,6 +236,9 @@ function eliminar(id) {
           traerDatos();
         },
       },
+      error: function () {
+        alert("Error en eliminar client");
+      }
     });
   }
 }

@@ -254,6 +254,9 @@ $("#btnCrear").click(function crear() {
           traerDatos();
         },
       },
+      error: function () {
+        alert("Error en crear reservation");
+      },
     });
   }
 });
@@ -288,6 +291,9 @@ $("#btnActualizar").click(function actualizar() {
           traerDatos();
         },
       },
+      error: function () {
+        alert("Error en actualizar reservation");
+      },
     });
   }
 });
@@ -309,6 +315,9 @@ function eliminar(id) {
         204: function () {
           traerDatos();
         },
+      },
+      error: function () {
+        alert("Error en eliminar reservation");
       },
     });
   }

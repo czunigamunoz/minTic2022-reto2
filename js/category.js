@@ -27,8 +27,10 @@ function pintarElemento(response) {
     let divCloud = $("<div>").attr("class", "select-container");
     let selectCloud = $("<select>").attr("class", "select-item");
     element.clouds.forEach((cloud) => {
-      console.log(cloud)
-      selectCloud.append(`<option value="${cloud.id}"> ${cloud.name} </option>`);
+      console.log(cloud);
+      selectCloud.append(
+        `<option value="${cloud.id}"> ${cloud.name} </option>`
+      );
     });
     divCloud.append(selectCloud);
     row.append($("<td>").append(divCloud));
@@ -71,7 +73,7 @@ function setCampos(data) {
 /**
  * Funcion para validar que los campos no esten vacios
  */
- function validar() {
+function validar() {
   const elements = document.querySelectorAll(".form input");
 
   return validarCamposVacios(elements);
@@ -82,9 +84,8 @@ function setCampos(data) {
  * @param {number} id de categoria
  */
 async function obtenerElemento(id) {
-  let response;
   try {
-    response = await $.ajax({
+    const response = await $.ajax({
       url: DATAREQUEST.url + `/${id}`,
       type: "GET",
       dataType: DATAREQUEST.dataType,
@@ -100,9 +101,8 @@ async function obtenerElemento(id) {
  * Funcion que hace peticion GET al servicio REST
  */
 async function traerDatos() {
-  let response;
   try {
-    response = await $.ajax({
+    const response = await $.ajax({
       url: DATAREQUEST.url + "/all",
       type: "GET",
       dataType: DATAREQUEST.dataType,
@@ -110,7 +110,9 @@ async function traerDatos() {
     pintarElemento(response);
     return response;
   } catch (error) {
-    console.error(`Hubo un problema trayendo los datos, Error: ${error.message}`);
+    console.error(
+      `Hubo un problema trayendo los datos, Error: ${error.message}`
+    );
   }
 }
 
@@ -120,12 +122,10 @@ async function traerDatos() {
 $("#btnCrear").click(function crear() {
   if (!validar()) {
     alert("Se deben llenar los campos.");
-  } 
-  else if (!validarMenor45Caracteres($("#name").val())) {
-    alert("Campo name no debe tener mas de 45 caracteres")
-  } 
-  else if (!validarMenor250Caracteres($("#description").val())) {
-    alert("Campo description no debe tener mas de 250 caracteres")
+  } else if (!validarMenor45Caracteres($("#name").val())) {
+    alert("Campo name no debe tener mas de 45 caracteres");
+  } else if (!validarMenor250Caracteres($("#description").val())) {
+    alert("Campo description no debe tener mas de 250 caracteres");
   } else {
     const newData = obtenerCampos();
     const data = {
@@ -145,6 +145,9 @@ $("#btnCrear").click(function crear() {
           traerDatos();
         },
       },
+      error: function () {
+        alert("Error en crear category");
+      },
     });
   }
 });
@@ -155,18 +158,16 @@ $("#btnCrear").click(function crear() {
 $("#btnActualizar").click(function actualizar() {
   if (!validar()) {
     alert("Se deben llenar los campos.");
-  } 
-  else if (!validarMenor45Caracteres($("#name").val())) {
-    alert("Campo name no debe tener mas de 45 caracteres")
-  } 
-  else if (!validarMenor250Caracteres($("#description").val())) {
-    alert("Campo description no debe tener mas de 250 caracteres")
+  } else if (!validarMenor45Caracteres($("#name").val())) {
+    alert("Campo name no debe tener mas de 45 caracteres");
+  } else if (!validarMenor250Caracteres($("#description").val())) {
+    alert("Campo description no debe tener mas de 250 caracteres");
   } else {
     const dataCategory = obtenerCampos();
     const data = {
       id: ID_CATEGORY,
       name: dataCategory.name,
-      description: dataCategory.description
+      description: dataCategory.description,
     }; // Se crea un objeto con los datos a actualizar.
     $.ajax({
       url: DATAREQUEST.url + "/update",
@@ -180,6 +181,9 @@ $("#btnActualizar").click(function actualizar() {
           limiparCampos();
           traerDatos();
         },
+      },
+      error: function () {
+        alert("Error en actualizar category");
       },
     });
   }
@@ -202,6 +206,9 @@ function eliminar(id) {
         204: function () {
           traerDatos();
         },
+      },
+      error: function () {
+        alert("Error en eliminar category");
       },
     });
   }
