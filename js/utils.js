@@ -16,7 +16,6 @@ function validarMenor250Caracteres(texto) {
 }
 
 function validarAnio(anio) {
-  console.log(anio);
   return anio.length === 4;
 }
 

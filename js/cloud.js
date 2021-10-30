@@ -8,12 +8,13 @@ let ID_CLOUD = null;
 /**
  * Funcion que limpia los campos del formulario
  */
-function limiparCampos() {
+function limpiarCampos() {
   $("#name").val("");
   $("#brand").val("");
   $("#year").val("");
   $("#description").val("");
-  $("#category").val("");
+  $("#category").attr("disabled", false);
+  inputCategory();
 }
 
 /**
@@ -21,7 +22,6 @@ function limiparCampos() {
  * @param {Response} response
  */
 function pintarElemento(response) {
-  console.log(response);
   $("#contenidoTabla").empty();
   response.forEach((element) => {
     let row = $("<tr>");
@@ -85,9 +85,9 @@ function setCampos(data) {
   $("#brand").val(data.brand);
   $("#year").val(data.year);
   $("#description").val(data.description);
-  const category = document.getElementById("category");
-  category.selectedIndex = data.category.id;
-  category.setAttribute("disabled", true);
+  $("#category").empty();
+  $("#category").append(`<option value="${data.category.id}"> ${data.category.name}</option>`);
+  $("#category").attr("disabled", true);
 }
 
 /**
@@ -95,18 +95,23 @@ function setCampos(data) {
  * y los pinta en el select de category
  */
 async function inputCategory() {
-  const categories = await $.ajax({
-    url: "http://localhost:8080/api/Category/all",
-    type: "GET",
-    dataType: DATAREQUEST.dataType,
-  });
-  for (let i = 0; i < categories.length; i++) {
-    let option = document.createElement("option");
-    option.setAttribute("class", "select-item");
-    option.value = categories[i].id;
-    option.text = categories[i].name;
-    $("#category").append(option);
-  }
+  try {
+    const categories = await $.ajax({
+      url: "http://localhost:8080/api/Category/all",
+      type: "GET",
+      dataType: DATAREQUEST.dataType,
+    });
+    $("#category").empty();
+    $("#category").append('<option value=""> Seleccionar Categoria</option>');
+    categories.forEach(category => {
+      const option = $("<option>")
+      option.attr("value", category.id);
+      option.text(category.name);
+      $("#category").append(option);  
+    });  
+  } catch (error) {
+    console.error(`Hubo un problema trayendo los datos de category, Error: ${error.message}`);
+  }  
 }
 
 /**
@@ -122,17 +127,16 @@ function validar() {
  * @param {number} id de cloud
  */
 async function obtenerElemento(id) {
-  let response;
   try {
-    response = await $.ajax({
+    const cloud = await $.ajax({
       url: DATAREQUEST.url + `/${id}`,
       type: "GET",
       dataType: DATAREQUEST.dataType,
     });
     ID_CLOUD = id;
-    setCampos(response);
+    setCampos(cloud);
   } catch (error) {
-    console.error(`Hubo un problema trayendo los datos, Error: ${error.message}`);
+    console.error(`Hubo un problema trayendo los datos de cloud, Error: ${error.message}`);
   }
 }
 
@@ -140,15 +144,13 @@ async function obtenerElemento(id) {
  * Funcion que hace peticion GET al servicio REST
  */
 async function traerDatos() {
-  let response;
   try {
-    response = await $.ajax({
+    const categories = await $.ajax({
       url: DATAREQUEST.url + "/all",
       type: "GET",
       dataType: DATAREQUEST.dataType,
     });
-    pintarElemento(response);
-    return response;
+    pintarElemento(categories);
   } catch (error) {
     alert(`Hubo un problema trayendo los datos, Error: ${error.message}`);
   }
@@ -214,7 +216,7 @@ $("#btnCrear").click(function crear() {
       statusCode: {
         201: function () {
           alert("Se agrego la nube exitosamente");
-          limiparCampos();
+          limpiarCampos();
           traerDatos();
         },
       },
@@ -255,9 +257,7 @@ $("#btnActualizar").click(function actualizar() {
       statusCode: {
         201: function () {
           alert("La operacion fue exitosa");
-          const category = document.getElementById("category");
-          category.setAttribute("disabled", false);
-          limiparCampos();
+          limpiarCampos();
           traerDatos();
         },
       },

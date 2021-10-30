@@ -3,17 +3,21 @@ const DATAREQUEST = {
   dataType: "json",
   contentType: "application/json; charset=utf-8",
 };
-const URL_CLOUD = "http://localhost:8080/api/Cloud/all"
-const URL_CLIENT = "http://localhost:8080/api/Client/all"
+const URL_CLOUD = "http://localhost:8080/api/Cloud/all";
+const URL_CLIENT = "http://localhost:8080/api/Client/all";
 let ID_RESERVATION = null;
 
 /**
  * Funcion que limpia los campos del formulario
  */
-function limiparCampos() {
+function limpiarCampos() {
   $("#status").val("");
   $("#startDate").val("");
   $("fechaFinal").val("");
+  $("#cloud").attr("disable", false);
+  $("#client").attr("disable", false);
+  inputCloud();
+  inputClient();
 }
 
 /**
@@ -91,7 +95,7 @@ function setCampos(data) {
   cloud.setAttribute("disabled", true);
   const client = document.getElementById("client");
   client.selectedIndex = data.client.idClient;
-  client.setAttribute("disabled", true)
+  client.setAttribute("disabled", true);
 }
 
 /**
@@ -99,20 +103,23 @@ function setCampos(data) {
  * y los pinta en el select de cloud
  */
 async function inputCloud() {
-  $("#cloud option").remove();
-  const clouds = await $.ajax({
-    url: URL_CLOUD,
-    type: "GET",
-    dataType: DATAREQUEST.dataType,
-  });
-  $("#cloud").append($("<option>"));
-  for (let i = 0; i < clouds.length; i++) {
-    let option = document.createElement("option");
-    option.setAttribute("class", "select-item");
-    option.value = clouds[i].id;
-    option.text = clouds[i].name;
-    $("#cloud").append(option);
-  }
+  try {
+    const clouds = await $.ajax({
+      url: URL_CLOUD,
+      type: "GET",
+      dataType: DATAREQUEST.dataType
+    });
+    $("#cloud").empty();
+    $("#cloud").append('<option value=""> Seleccionar Categoria</option>');
+    clouds.forEach(cloud => {
+      const option = $("<option>")
+      option.attr("value", cloud.id);
+      option.text(cloud.name);
+      $("#cloud").append(option);  
+    });
+  } catch (error) {
+    console.error(`Hubo un problema trayendo los datos de cloud, Error: ${error.message}`);
+  } 
 }
 
 /**
@@ -120,19 +127,22 @@ async function inputCloud() {
  * y los pinta en el select de client
  */
 async function inputClient() {
-  $("#client option").remove();
-  const clients = await $.ajax({
-    url: URL_CLIENT,
-    type: "GET",
-    dataType: DATAREQUEST.dataType,
-  });
-  $("#client").append($("<option>"));
-  for (let i = 0; i < clients.length; i++) {
-    let option = document.createElement("option");
-    option.setAttribute("class", "select-item");
-    option.value = clients[i].idClient;
-    option.text = clients[i].name;
-    $("#client").append(option);
+  try {
+    const clients = await $.ajax({
+      url: URL_CLIENT,
+      type: "GET",
+      dataType: DATAREQUEST.dataType
+    });
+    $("#client").empty();
+    $("#client").append('<option value=""> Seleccionar Categoria</option>');
+    clients.forEach(client => {
+      const option = $("<option>")
+      option.attr("value", client.idClient);
+      option.text(client.name);
+      $("#client").append(option);
+    });
+  } catch (error) {
+    console.error(`Hubo un problema trayendo los datos de client, Error: ${error.message}`);
   }
 }
 
@@ -141,9 +151,9 @@ async function inputClient() {
  */
 function validar() {
   const elements = document.querySelectorAll(".form input");
-  const selectElements = document.querySelectorAll(".form select")
+  const selectElements = document.querySelectorAll(".form select");
 
-  return validarCamposVacios(elements) && validarCamposVacios(selectElements)
+  return validarCamposVacios(elements) && validarCamposVacios(selectElements);
 }
 
 /**
@@ -190,18 +200,19 @@ async function traerDatos() {
     $("#startDate").val(getCurrentDate());
     $("#startDate").attr("disabled", true);
     $("#status").val("Creado").attr("disabled", true);
-    // $("#status").attr("disabled", true);
     inputCloud();
     inputClient();
     return response;
   } catch (error) {
-    console.error(`Hubo un problema trayendo los datos, Error: ${error.message}`);
+    console.error(
+      `Hubo un problema trayendo los datos, Error: ${error.message}`
+    );
   }
 }
 
 /**
  * Funcion que asigna a un objeto los valores del formulario
- * @param {String} typeMethod Metodo http que se va a realizar 
+ * @param {String} typeMethod Metodo http que se va a realizar
  * @returns Objeto con los datos del formulario
  */
 function organizarDatos(typeMethod) {
@@ -211,8 +222,8 @@ function organizarDatos(typeMethod) {
     data = {
       startDate: dataReservation.startDate,
       devolutionDate: dataReservation.devolutionDate,
-      client: { idClient: Number.parseInt(dataReservation.client)},
-      cloud: { id: Number.parseInt(dataReservation.cloud)},
+      client: { idClient: Number.parseInt(dataReservation.client) },
+      cloud: { id: Number.parseInt(dataReservation.cloud) },
     };
   }
   if (typeMethod === "put") {
@@ -223,8 +234,8 @@ function organizarDatos(typeMethod) {
       startDate: dataReservation.startDate,
       devolutionDate: dataReservation.devolutionDate,
       status: dataReservation.status,
-      client: { idClient: Number.parseInt(dataReservation.client)},
-      cloud: { id: Number.parseInt(dataReservation.cloud)},
+      client: { idClient: Number.parseInt(dataReservation.client) },
+      cloud: { id: Number.parseInt(dataReservation.cloud) },
     };
   }
   return data;
@@ -236,9 +247,9 @@ function organizarDatos(typeMethod) {
 $("#btnCrear").click(function crear() {
   if (!validar()) {
     alert("Se deben llenar los campos.");
-  } 
+  }
   if (!validarFecha($("#startDate").val(), $("#devolutionDate").val())) {
-    alert("La fecha de inicio debe ser anterior a la fecha final")
+    alert("La fecha de inicio debe ser anterior a la fecha final");
   } else {
     const data = organizarDatos("post");
     $.ajax({
@@ -250,7 +261,7 @@ $("#btnCrear").click(function crear() {
       statusCode: {
         201: function () {
           alert("Se agrego de manera exitosa");
-          limiparCampos();
+          limpiarCampos();
           traerDatos();
         },
       },
@@ -267,9 +278,9 @@ $("#btnCrear").click(function crear() {
 $("#btnActualizar").click(function actualizar() {
   if (!validar()) {
     alert("Se deben llenar los campos.");
-  } 
+  }
   if (!validarFecha($("#startDate").val(), $("#devolutionDate").val())) {
-    alert("La fecha de inicio debe ser anterior a la fecha final")
+    alert("La fecha de inicio debe ser anterior a la fecha final");
   } else {
     const data = organizarDatos("put");
     console.log("===== Lo que se envia======");
@@ -283,11 +294,7 @@ $("#btnActualizar").click(function actualizar() {
       statusCode: {
         201: function () {
           alert("La operacion fue exitosa");
-          const cloud = document.getElementById("cloud");
-          cloud.setAttribute("disabled", false);
-          const client = document.getElementById("client");
-          client.setAttribute("disabled", false);
-          limiparCampos();
+          limpiarCampos();
           traerDatos();
         },
       },

@@ -10,10 +10,12 @@ let ID_MESSAGE = null;
 /**
  * Funcion que limpia los campos del formulario
  */
-function limiparCampos() {
+function limpiarCampos() {
   $("#messageText").val("");
-  $("#cloud").val("");
-  $("#category").val("");
+  $("#cloud").attr("disable", false);
+  $("#client").attr("disable", false);
+  inputCloud();
+  inputClient();
 }
 
 /**
@@ -61,12 +63,12 @@ function obtenerCampos() {
  */
 function setCampos(data) {
   $("#messageText").val(data.messageText);
-  const cloud = document.getElementById("cloud");
-  cloud.selectedIndex = data.cloud.id;
-  cloud.setAttribute("disabled", true);
-  const client = document.getElementById("client");
-  client.selectedIndex = data.client.idClient;
-  client.setAttribute("disabled", true)
+  $("#cloud").empty();
+  $("#cloud").append(`<option value="${data.cloud.id}"> ${data.cloud.name}</option>`);
+  $("#client").empty();
+  $("#client").append(`<option value="${data.client.idClient}"> ${data.client.name}</option>`);
+  $("#cloud").attr("disable", true);
+  $("#client").attr("disable", true);
 }
 
 /**
@@ -74,18 +76,23 @@ function setCampos(data) {
  * y los pinta en el select de cloud
  */
 async function inputCloud(){
-  const clouds = await $.ajax({
-    url: URL_CLOUD,
-    type: "GET",
-    dataType: DATAREQUEST.dataType
-  });
-  for (let i = 0; i < clouds.length; i++) {
-    let option = document.createElement("option")
-    option.setAttribute("class", "select-item")
-    option.value = clouds[i].id
-    option.text = clouds[i].name
-    $("#cloud").append(option)
-  }
+  try {
+    const clouds = await $.ajax({
+      url: URL_CLOUD,
+      type: "GET",
+      dataType: DATAREQUEST.dataType
+    });
+    $("#cloud").empty();
+    $("#cloud").append('<option value=""> Seleccionar Categoria</option>');
+    clouds.forEach(cloud => {
+      const option = $("<option>")
+      option.attr("value", cloud.id);
+      option.text(cloud.name);
+      $("#cloud").append(option);  
+    });
+  } catch (error) {
+    console.error(`Hubo un problema trayendo los datos de cloud, Error: ${error.message}`);
+  }  
 }
 
 /**
@@ -93,18 +100,23 @@ async function inputCloud(){
  * y los pinta en el select de client
  */
 async function inputClient(){
-  const clients = await $.ajax({
-    url: URL_CLIENT,
-    type: "GET",
-    dataType: DATAREQUEST.dataType
-  });
-  for (let i = 0; i < clients.length; i++) {
-    let option = document.createElement("option")
-    option.setAttribute("class", "select-item")
-    option.value = clients[i].idClient
-    option.text = clients[i].name
-    $("#client").append(option)
-  }
+  try {
+    const clients = await $.ajax({
+      url: URL_CLIENT,
+      type: "GET",
+      dataType: DATAREQUEST.dataType
+    });
+    $("#client").empty();
+    $("#client").append('<option value=""> Seleccionar Categoria</option>');
+    clients.forEach(client => {
+      const option = $("<option>")
+      option.attr("value", client.idClient);
+      option.text(client.name);
+      $("#client").append(option);  
+    });
+  } catch (error) {
+    console.error(`Hubo un problema trayendo los datos de client, Error: ${error.message}`);
+  }  
 }
 
 /**
@@ -122,15 +134,14 @@ function validar(){
  * @param {number} id de mensaje
  */
 async function obtenerElemento(id) {
-  let response;
   try {
-    response = await $.ajax({
+    const message = await $.ajax({
       url: DATAREQUEST.url + `/${id}`,
       type: "GET",
       dataType: DATAREQUEST.dataType,
     });
     ID_MESSAGE = id;
-    setCampos(response);
+    setCampos(message);
   } catch (error) {
     alert(`Hubo un problema trayendo los datos, Error: ${error.message}`);
   }
@@ -140,15 +151,13 @@ async function obtenerElemento(id) {
  * Funcion que hace peticion GET al servicio REST
  */
 async function traerDatos() {
-  let response;
   try {
-    response = await $.ajax({
+    const messages = await $.ajax({
       url: DATAREQUEST.url + "/all",
       type: "GET",
       dataType: DATAREQUEST.dataType,
     });
-    pintarElemento(response);
-    return response;
+    pintarElemento(messages);
   } catch (error) {
     console.error(`Hubo un problema trayendo los datos, Error: ${error.message}`);
   }
@@ -161,6 +170,7 @@ async function traerDatos() {
  */
 function organizarDatos(typeMethod){
   const dataMessage = obtenerCampos();
+  console.log(dataMessage);
   let data
   if (typeMethod === "post"){
     data = {
@@ -202,7 +212,7 @@ $("#btnCrear").click(function crear() {
       statusCode: {
         201: function () {
           alert("Se agrego la nube exitosamente");
-          limiparCampos();
+          limpiarCampos();
           traerDatos();
         },
       },
@@ -233,11 +243,7 @@ $("#btnActualizar").click(function actualizar() {
       statusCode: {
         201: function () {
           alert("La operacion fue exitosa");
-          const cloud = document.getElementById("cloud");
-          cloud.setAttribute("disabled", false);
-          const client = document.getElementById("client");
-          client.setAttribute("disabled", false);
-          limiparCampos();
+          limpiarCampos();
           traerDatos();
         },
       },

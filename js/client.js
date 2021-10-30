@@ -8,7 +8,7 @@ let ID_CLIENT = null;
 /**
  * Funcion que limpia los campos del formulario
  */
-function limiparCampos() {
+function limpiarCampos() {
   $("#name").val("");
   $("#email").val("");
   $("#password").val("");
@@ -121,7 +121,6 @@ async function traerDatos() {
       dataType: DATAREQUEST.dataType,
     });
     pintarElemento(response);
-    return response;
   } catch (error) {
     console.error(`Hubo un problema trayendo los datos, Error: ${error.message}`);
   }
@@ -157,7 +156,7 @@ $("#btnCrear").click(function crear() {
       statusCode: {
         201: function () {
           alert("Se agrego el cliente exitosamente");
-          limiparCampos();
+          limpiarCampos();
           traerDatos();
         },
       },
@@ -206,7 +205,7 @@ $("#btnActualizar").click(function actualizar() {
         201: function () {
           alert("La operacion fue exitosa");
           $("#email").val(data.email).attr("readonly", "false");
-          limiparCampos();
+          limpiarCampos();
           traerDatos();
         },
       },

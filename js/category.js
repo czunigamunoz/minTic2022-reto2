@@ -8,7 +8,7 @@ let ID_CATEGORY = null;
 /**
  * Funcion que limpia los campos del formulario
  */
-function limiparCampos() {
+function limpiarCampos() {
   $("#name").val("");
   $("#description").val("");
 }
@@ -141,7 +141,7 @@ $("#btnCrear").click(function crear() {
       statusCode: {
         201: function () {
           alert("Se agrego de manera exitosa");
-          limiparCampos();
+          limpiarCampos();
           traerDatos();
         },
       },
@@ -178,7 +178,7 @@ $("#btnActualizar").click(function actualizar() {
       statusCode: {
         201: function () {
           alert("La operacion fue exitosa");
-          limiparCampos();
+          limpiarCampos();
           traerDatos();
         },
       },
