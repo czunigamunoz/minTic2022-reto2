@@ -15,7 +15,7 @@ function limpiarCampos() {
   $("#year").val("");
   $("#description").val("");
   $("#category").attr("disabled", false);
-  $("#btnCrear").show();
+  $("#btnCrear").show("slow");
   inputCategory();
 }
 

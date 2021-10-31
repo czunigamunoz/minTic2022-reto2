@@ -13,6 +13,7 @@ function limpiarCampos() {
   $("#email").val("");
   $("#password").val("");
   $("#age").val("");
+  $("#btnCrear").show("slow");
 }
 
 /**
@@ -81,6 +82,7 @@ function setCampos(data) {
   $("#email").val(data.email).attr("readonly", "true");
   $("#password").val(data.password);
   $("#age").val(data.age);
+  $("#btnCrear").hide("slow");
 }
 
 /**
@@ -96,15 +98,14 @@ function validar() {
  * @param {number} id de cliente
  */
 async function obtenerElemento(id) {
-  let response;
   try {
-    response = await $.ajax({
+    const client = await $.ajax({
       url: DATAREQUEST.url + `/${id}`,
       type: "GET",
       dataType: DATAREQUEST.dataType,
     });
     ID_CLIENT = id;
-    setCampos(response);
+    setCampos(client);
   } catch (error) {
     alert(`Hubo un problema trayendo los datos, Error: ${error.message}`);
   }

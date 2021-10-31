@@ -11,6 +11,7 @@ let ID_CATEGORY = null;
 function limpiarCampos() {
   $("#name").val("");
   $("#description").val("");
+  $("#btnCrear").show("slow");
 }
 
 /**
@@ -68,6 +69,7 @@ function obtenerCampos() {
 function setCampos(data) {
   $("#name").val(data.name);
   $("#description").val(data.description);
+  $("#btnCrear").hide("slow");
 }
 
 /**

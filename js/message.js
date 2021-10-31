@@ -14,7 +14,7 @@ function limpiarCampos() {
   $("#messageText").val("");
   $("#cloud").attr("disable", false);
   $("#client").attr("disable", false);
-  $("#btnCrear").show();
+  $("#btnCrear").show("slow");
   inputCloud();
   inputClient();
 }
