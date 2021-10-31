@@ -130,22 +130,12 @@ async function traerDatos() {
  * Funcion para crear un nuevo campo a la tabla CLIENT
  */
 $("#btnCrear").click(function crear() {
-  if (!validar()) {
-    alert("Se deben llenar los campos.");
-  } else if (
-    !validarMenor45Caracteres($("#email").val())) {
-    alert("Campo email no debe tener mas de 45 caracteres");
-  } 
-  else if (
-    !validarMenor45Caracteres($("#password").val())) {
-    alert("Campo password no debe tener mas de 45 caracteres");
-  } 
-  else if (!validarCampoEdad($("#age").val())){
-    alert("Campo age debe ser un entero de entre 0 y 120");
-  }
-  else if (!validarMenor250Caracteres($("#name").val())){
-    alert("Campo name no debe tener mas de 250 caracteres");
-  } else {
+  try {
+    if (!validar()) throw "Campos no deben estar vacios";
+    if (!validarMenor45Caracteres($("#email").val())) throw "Campo email no debe tener mas de 45 caracteres";
+    if (!validarMenor45Caracteres($("#password").val())) throw "Campo password no debe tener mas de 45 caracteres";
+    if (!validarCampoEdad($("#age").val())) throw "Campo age debe ser un entero de entre 0 y 120";
+    if (!validarMenor250Caracteres($("#name").val())) throw "Campo name no debe tener mas de 250 caracteres";
     const dataCategory = JSON.stringify(obtenerCampos());
     $.ajax({
       url: DATAREQUEST.url + "/save",
@@ -163,7 +153,9 @@ $("#btnCrear").click(function crear() {
       error: function () {
         alert("Error en crear client");
       }
-    });
+    });  
+  } catch (error) {
+    alert(`Error en usuario: ${error}`)
   }
 });
 
@@ -171,22 +163,12 @@ $("#btnCrear").click(function crear() {
  * Funcion para actualizar dato de CLIENT
  */
 $("#btnActualizar").click(function actualizar() {
-  if (!validar()) {
-    alert("Se deben llenar los campos.");
-  } else if (
-    !validarMenor45Caracteres($("#email").val())) {
-    alert("Campo email no debe tener mas de 45 caracteres");
-  } 
-  else if (
-    !validarMenor45Caracteres($("#password").val())) {
-    alert("Campo password no debe tener mas de 45 caracteres");
-  } 
-  else if (!validarCampoEdad($("#age").val())){
-    alert("Campo age debe ser un entero de entre 0 y 120");
-  }
-  else if (!validarMenor250Caracteres($("#name").val())){
-    alert("Campo name no debe tener mas de 250 caracteres");
-  } else {
+  try {
+    if (!validar()) throw "Campos no deben estar vacios";
+    if (!validarMenor45Caracteres($("#email").val())) throw "Campo email no debe tener mas de 45 caracteres";
+    if (!validarMenor45Caracteres($("#password").val())) throw "Campo password no debe tener mas de 45 caracteres";
+    if (!validarCampoEdad($("#age").val())) throw "Campo age debe ser un entero de entre 0 y 120";
+    if (!validarMenor250Caracteres($("#name").val())) throw "Campo name no debe tener mas de 250 caracteres";
     const dataCategory = obtenerCampos();
     const data = {
       idClient: ID_CLIENT,
@@ -213,6 +195,8 @@ $("#btnActualizar").click(function actualizar() {
         alert("Error en actualizar client");
       }
     });
+  } catch (error) {
+    alert(`Error en usuario: ${error}`)
   }
 });
 

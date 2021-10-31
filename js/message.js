@@ -3,8 +3,8 @@ const DATAREQUEST = {
   dataType: "json",
   contentType: "application/json; charset=utf-8",
 };
-const URL_CLOUD = "http://localhost:8080/api/Cloud/all"
-const URL_CLIENT = "http://localhost:8080/api/Client/all"
+const URL_CLOUD = "http://localhost:8080/api/Cloud/all";
+const URL_CLIENT = "http://localhost:8080/api/Client/all";
 let ID_MESSAGE = null;
 
 /**
@@ -14,6 +14,7 @@ function limpiarCampos() {
   $("#messageText").val("");
   $("#cloud").attr("disable", false);
   $("#client").attr("disable", false);
+  $("#btnCrear").show();
   inputCloud();
   inputClient();
 }
@@ -69,64 +70,69 @@ function setCampos(data) {
   $("#client").append(`<option value="${data.client.idClient}"> ${data.client.name}</option>`);
   $("#cloud").attr("disable", true);
   $("#client").attr("disable", true);
+  $("#btnCrear").hide("slow");
 }
 
 /**
  * Funcion que trae todos los elementos de la tabla CLOUD
  * y los pinta en el select de cloud
  */
-async function inputCloud(){
+async function inputCloud() {
   try {
     const clouds = await $.ajax({
       url: URL_CLOUD,
       type: "GET",
-      dataType: DATAREQUEST.dataType
+      dataType: DATAREQUEST.dataType,
     });
     $("#cloud").empty();
-    $("#cloud").append('<option value=""> Seleccionar Categoria</option>');
-    clouds.forEach(cloud => {
-      const option = $("<option>")
+    $("#cloud").append('<option value="0"> Seleccionar Cloud</option>');
+    clouds.forEach((cloud) => {
+      const option = $("<option>");
       option.attr("value", cloud.id);
       option.text(cloud.name);
-      $("#cloud").append(option);  
+      $("#cloud").append(option);
     });
   } catch (error) {
-    console.error(`Hubo un problema trayendo los datos de cloud, Error: ${error.message}`);
-  }  
+    console.error(
+      `Hubo un problema trayendo los datos de cloud, Error: ${error.message}`
+    );
+  }
 }
 
 /**
  * Funcion que trae todos los elementos de la tabla CLIENT
  * y los pinta en el select de client
  */
-async function inputClient(){
+async function inputClient() {
   try {
     const clients = await $.ajax({
       url: URL_CLIENT,
       type: "GET",
-      dataType: DATAREQUEST.dataType
+      dataType: DATAREQUEST.dataType,
     });
     $("#client").empty();
-    $("#client").append('<option value=""> Seleccionar Categoria</option>');
-    clients.forEach(client => {
-      const option = $("<option>")
+    $("#client").append('<option value="0"> Seleccionar Client</option>');
+    clients.forEach((client) => {
+      const option = $("<option>");
       option.attr("value", client.idClient);
       option.text(client.name);
-      $("#client").append(option);  
+      $("#client").append(option);
     });
   } catch (error) {
-    console.error(`Hubo un problema trayendo los datos de client, Error: ${error.message}`);
-  }  
+    console.error(
+      `Hubo un problema trayendo los datos de client, Error: ${error.message}`
+    );
+  }
 }
 
 /**
  * Funcion para validar que los campos no esten vacios
  */
-function validar(){
+function validar() {
   const elements = document.querySelectorAll(".form input");
-  const selectElements = document.querySelectorAll(".form select")
+  const selectElements = document.querySelectorAll(".form select");
 
-  return validarCamposVacios(elements) && validarCamposVacios(selectElements)
+  return validarCamposVacios(elements) && validarCamposVacios(selectElements);
 }
 
 /**
@@ -159,34 +165,34 @@ async function traerDatos() {
     });
     pintarElemento(messages);
   } catch (error) {
-    console.error(`Hubo un problema trayendo los datos, Error: ${error.message}`);
+    console.error(
+      `Hubo un problema trayendo los datos, Error: ${error.message}`
+    );
   }
 }
 
 /**
  * Funcion que asigna a un objeto los valores del formulario
- * @param {String} typeMethod Metodo http que se va a realizar 
+ * @param {String} typeMethod Metodo http que se va a realizar
  * @returns Objeto con los datos del formulario
  */
-function organizarDatos(typeMethod){
+function organizarDatos(typeMethod) {
   const dataMessage = obtenerCampos();
-  console.log(dataMessage);
-  let data
-  if (typeMethod === "post"){
+  let data;
+  if (typeMethod === "post") {
     data = {
       messageText: dataMessage.messageText,
-      client: {"idClient": Number.parseInt(dataMessage.client)},
-      cloud: {"id": Number.parseInt(dataMessage.cloud)},
-    }
+      client: { idClient: Number.parseInt(dataMessage.client) },
+      cloud: { id: Number.parseInt(dataMessage.cloud) },
+    };
   }
-  if (typeMethod === "put"){
+  if (typeMethod === "put") {
     data = {
       idMessage: ID_MESSAGE,
       messageText: dataMessage.messageText,
-      client: {"idClient": Number.parseInt(dataMessage.client)},
-      cloud: {"id": Number.parseInt(dataMessage.cloud)},
-    }
-
+      client: { idClient: Number.parseInt(dataMessage.client) },
+      cloud: { id: Number.parseInt(dataMessage.cloud) },
+    };
   }
   return data;
 }
@@ -195,14 +201,12 @@ function organizarDatos(typeMethod){
  * Funcion para crear un nuevo campo a la tabla MESSAGE
  */
 $("#btnCrear").click(function crear() {
-  if (!validar()) {
-    alert("Se deben llenar los campos.");
-  } else if (
-    !validarMenor250Caracteres($("#messageText").val())) {
-    alert("Campo message no debe tener mas de 250 caracteres");
-  }  else {
+  try {
+    if (!validar()) throw "Campos no deben estar vacios";
+    if (!validarMenor250Caracteres($("#messageText").val())) throw "Campo message no debe tener mas de 250 caracteres";
+    if ($("#cloud").val() === "0") throw "Debe seleccionar una cloud";
+    if ($("#client").val() === "0") throw "Debe seleccionar una client";
     const data = organizarDatos("post");
-    console.log(data);
     $.ajax({
       url: DATAREQUEST.url + "/save",
       type: "POST",
@@ -220,6 +224,8 @@ $("#btnCrear").click(function crear() {
         alert("Error en crear message");
       },
     });
+  } catch (error) {
+    alert(`Error en usuario: ${error}`);
   }
 });
 
@@ -227,12 +233,9 @@ $("#btnCrear").click(function crear() {
  * Funcion para actualizar dato de MESSAGE
  */
 $("#btnActualizar").click(function actualizar() {
-  if (!validar()) {
-    alert("Se deben llenar los campos.");
-  } else if (
-    !validarMenor250Caracteres($("#messageText").val())) {
-    alert("Campo message no debe tener mas de 250 caracteres");
-  }  else {
+  try {
+    if (!validar()) throw "Campos no deben estar vacios";
+    if (!validarMenor250Caracteres($("#messageText").val())) throw "Campo message no debe tener mas de 250 caracteres";
     const data = organizarDatos("put");
     $.ajax({
       url: DATAREQUEST.url + "/update",
@@ -251,6 +254,8 @@ $("#btnActualizar").click(function actualizar() {
         alert("Error en actualizar message");
       },
     });
+  } catch (error) {
+    alert(`Error en usuario: ${error}`);
   }
 });
 

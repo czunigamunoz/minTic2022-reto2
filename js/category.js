@@ -120,13 +120,10 @@ async function traerDatos() {
  * Funcion para crear un nuevo campo a la tabla CATEGORY
  */
 $("#btnCrear").click(function crear() {
-  if (!validar()) {
-    alert("Se deben llenar los campos.");
-  } else if (!validarMenor45Caracteres($("#name").val())) {
-    alert("Campo name no debe tener mas de 45 caracteres");
-  } else if (!validarMenor250Caracteres($("#description").val())) {
-    alert("Campo description no debe tener mas de 250 caracteres");
-  } else {
+  try {
+    if (!validar()) throw "Campos no deben estar vacios";
+    if (!validarMenor45Caracteres($("#name").val())) throw "Campo name no debe tener mas de 45 caracteres";
+    if (!validarMenor250Caracteres($("#description").val())) throw "Campo description no debe tener mas de 250 caracteres";
     const newData = obtenerCampos();
     const data = {
       name: newData.name,
@@ -149,6 +146,8 @@ $("#btnCrear").click(function crear() {
         alert("Error en crear category");
       },
     });
+  } catch (error) {
+    alert(`Error en usuario: ${error}`); 
   }
 });
 
@@ -156,13 +155,10 @@ $("#btnCrear").click(function crear() {
  * Funcion para actualizar dato de CATEGORY
  */
 $("#btnActualizar").click(function actualizar() {
-  if (!validar()) {
-    alert("Se deben llenar los campos.");
-  } else if (!validarMenor45Caracteres($("#name").val())) {
-    alert("Campo name no debe tener mas de 45 caracteres");
-  } else if (!validarMenor250Caracteres($("#description").val())) {
-    alert("Campo description no debe tener mas de 250 caracteres");
-  } else {
+  try {
+    if (!validar()) throw "Campos no deben estar vacios";
+    if (!validarMenor45Caracteres($("#name").val())) throw "Campo name no debe tener mas de 45 caracteres";
+    if (!validarMenor250Caracteres($("#description").val())) throw "Campo description no debe tener mas de 250 caracteres";
     const dataCategory = obtenerCampos();
     const data = {
       id: ID_CATEGORY,
@@ -186,6 +182,8 @@ $("#btnActualizar").click(function actualizar() {
         alert("Error en actualizar category");
       },
     });
+  } catch (error) {
+    alert(`Error en usuario: ${error}`); 
   }
 });
 

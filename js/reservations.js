@@ -16,6 +16,7 @@ function limpiarCampos() {
   $("fechaFinal").val("");
   $("#cloud").attr("disable", false);
   $("#client").attr("disable", false);
+  $("#btnCrear").show();
   inputCloud();
   inputClient();
 }
@@ -88,14 +89,18 @@ function setCampos(data) {
   $("#devolutionDate").val(devolutionDate);
 
   $("#startDate").val(startDate).attr("disabled", false);
-  $("#status").val(data.status).attr("disabled", false);
+  $("#status").attr("disabled", false);
+  $("#status").val($("#status option").val());
 
-  const cloud = document.getElementById("cloud");
-  cloud.selectedIndex = data.cloud.id;
-  cloud.setAttribute("disabled", true);
-  const client = document.getElementById("client");
-  client.selectedIndex = data.client.idClient;
-  client.setAttribute("disabled", true);
+  $("#cloud").empty();
+  $("#cloud").append(`<option value="${data.cloud.id}"> ${data.cloud.name}</option>`);
+  $("#cloud").attr("disable", true);
+
+  $("#client").empty();
+  $("#client").append(`<option value="${data.client.idClient}"> ${data.client.name}</option>`);
+  $("#client").attr("disable", true);
+
+  $("#btnCrear").hide("slow");
 }
 
 /**
@@ -110,7 +115,7 @@ async function inputCloud() {
       dataType: DATAREQUEST.dataType
     });
     $("#cloud").empty();
-    $("#cloud").append('<option value=""> Seleccionar Categoria</option>');
+    $("#cloud").append('<option value="0"> Seleccionar Cloud</option>');
     clouds.forEach(cloud => {
       const option = $("<option>")
       option.attr("value", cloud.id);
@@ -134,7 +139,7 @@ async function inputClient() {
       dataType: DATAREQUEST.dataType
     });
     $("#client").empty();
-    $("#client").append('<option value=""> Seleccionar Categoria</option>');
+    $("#client").append('<option value="0"> Seleccionar Client</option>');
     clients.forEach(client => {
       const option = $("<option>")
       option.attr("value", client.idClient);
@@ -245,12 +250,11 @@ function organizarDatos(typeMethod) {
  * Funcion para crear un nuevo campo a la tabla RESERVATION
  */
 $("#btnCrear").click(function crear() {
-  if (!validar()) {
-    alert("Se deben llenar los campos.");
-  }
-  if (!validarFecha($("#startDate").val(), $("#devolutionDate").val())) {
-    alert("La fecha de inicio debe ser anterior a la fecha final");
-  } else {
+  try {
+    if (!validar()) throw "Campos no deben estar vacios";
+    if (!validarFecha($("#startDate").val(), $("#devolutionDate").val())) throw "La fecha de inicio debe ser anterior a la fecha final";
+    if ($("#cloud").val() === "0") throw "Debe seleccionar una cloud";
+    if ($("#client").val() === "0") throw "Debe seleccionar un client";
     const data = organizarDatos("post");
     $.ajax({
       url: DATAREQUEST.url + "/save",
@@ -268,7 +272,9 @@ $("#btnCrear").click(function crear() {
       error: function () {
         alert("Error en crear reservation");
       },
-    });
+    });    
+  } catch (error) {
+    alert(`Error en usuario: ${error}`);
   }
 });
 
@@ -276,15 +282,11 @@ $("#btnCrear").click(function crear() {
  * Funcion para actualizar dato de RESERVATION
  */
 $("#btnActualizar").click(function actualizar() {
-  if (!validar()) {
-    alert("Se deben llenar los campos.");
-  }
-  if (!validarFecha($("#startDate").val(), $("#devolutionDate").val())) {
-    alert("La fecha de inicio debe ser anterior a la fecha final");
-  } else {
+  try {
+    if (!validar()) throw "Campos no deben estar vacios";
+    if (!validarFecha($("#startDate").val(), $("#devolutionDate").val())) throw "La fecha de inicio debe ser anterior a la fecha final";
+    if ($("#status").val() === "Seleccionar Status") throw "Debe seleccionar un status";
     const data = organizarDatos("put");
-    console.log("===== Lo que se envia======");
-    console.log(data);
     $.ajax({
       url: DATAREQUEST.url + "/update",
       type: "PUT",
@@ -302,6 +304,8 @@ $("#btnActualizar").click(function actualizar() {
         alert("Error en actualizar reservation");
       },
     });
+  } catch (error) {
+    alert(`Error en usuario: ${error}`);
   }
 });
 

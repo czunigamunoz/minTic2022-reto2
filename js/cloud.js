@@ -3,6 +3,7 @@ const DATAREQUEST = {
   dataType: "json",
   contentType: "application/json; charset=utf-8",
 };
+URL_CATEGORY = "http://localhost:8080/api/Category/all";
 let ID_CLOUD = null;
 
 /**
@@ -14,6 +15,7 @@ function limpiarCampos() {
   $("#year").val("");
   $("#description").val("");
   $("#category").attr("disabled", false);
+  $("#btnCrear").show();
   inputCategory();
 }
 
@@ -88,6 +90,7 @@ function setCampos(data) {
   $("#category").empty();
   $("#category").append(`<option value="${data.category.id}"> ${data.category.name}</option>`);
   $("#category").attr("disabled", true);
+  $("#btnCrear").hide("slow");
 }
 
 /**
@@ -97,12 +100,12 @@ function setCampos(data) {
 async function inputCategory() {
   try {
     const categories = await $.ajax({
-      url: "http://localhost:8080/api/Category/all",
+      url: URL_CATEGORY,
       type: "GET",
       dataType: DATAREQUEST.dataType,
     });
     $("#category").empty();
-    $("#category").append('<option value=""> Seleccionar Categoria</option>');
+    $("#category").append('<option value="0"> Seleccionar Categoria</option>');
     categories.forEach(category => {
       const option = $("<option>")
       option.attr("value", category.id);
@@ -190,22 +193,13 @@ function organizarDatos(typeMethod) {
  * Funcion para crear un nuevo campo a la tabla CLOUD
  */
 $("#btnCrear").click(function crear() {
-  if (!validar()) {
-    alert("Se deben llenar los campos.");
-  } else if (
-    !validarMenor45Caracteres($("#name").val())) {
-    alert("Campo name no debe tener mas de 45 caracteres");
-  } 
-  else if (
-    !validarMenor45Caracteres($("#brand").val())) {
-    alert("Campo brand no debe tener mas de 45 caracteres");
-  } 
-  else if (!validarAnio($("#year").val())){
-    alert("Campo year debe ser un entero de 4 digitos");
-  }
-  else if (!validarMenor250Caracteres($("#description").val())){
-    alert("Campo description no debe tener mas de 250 caracteres");
-  } else {
+  try {
+    if (!validar()) throw "Campos no deben estar vacios";
+    if (!validarMenor45Caracteres($("#name").val())) throw "Campo name no debe tener mas de 45 caracteres";
+    if (!validarMenor45Caracteres($("#brand").val())) throw "Campo brand no debe tener mas de 45 caracteres";
+    if (!validarAnio($("#year").val())) throw "Campo year debe ser un entero de 4 digitos";
+    if (!validarMenor250Caracteres($("#description").val())) throw "Campo description no debe tener mas de 250 caracteres";
+    if ($("#category").val() === '0') throw "Debe seleccionar una categoria";
     const data = organizarDatos("post");
     $.ajax({
       url: DATAREQUEST.url + "/save",
@@ -224,6 +218,8 @@ $("#btnCrear").click(function crear() {
         alert("Error en crear cloud");
       },
     });
+  } catch (error) {
+    alert(`Error en usuario: ${error}`); 
   }
 });
 
@@ -231,22 +227,12 @@ $("#btnCrear").click(function crear() {
  * Funcion para actualizar dato de CLOUD
  */
 $("#btnActualizar").click(function actualizar() {
-  if (!validar()) {
-    alert("Se deben llenar los campos.");
-  } else if (
-    !validarMenor45Caracteres($("#name").val())) {
-    alert("Campo name no debe tener mas de 45 caracteres");
-  } 
-  else if (
-    !validarMenor45Caracteres($("#brand").val())) {
-    alert("Campo brand no debe tener mas de 45 caracteres");
-  } 
-  else if (!validarAnio($("#year").val())){
-    alert("Campo year debe ser un entero de 4 digitos");
-  }
-  else if (!validarMenor250Caracteres($("#description").val())){
-    alert("Campo description no debe tener mas de 250 caracteres");
-  } else {
+  try {
+    if (!validar()) throw "Campos no deben estar vacios" ;
+    if (!validarMenor45Caracteres($("#name").val())) throw "Campo name no debe tener mas de 45 caracteres" ;
+    if (!validarMenor45Caracteres($("#brand").val())) throw "Campo brand no debe tener mas de 45 caracteres";
+    if (!validarAnio($("#year").val())) throw "Campo year debe ser un entero de 4 digitos";
+    if (!validarMenor250Caracteres($("#description").val())) throw "Campo description no debe tener mas de 250 caracteres";
     const data = organizarDatos("put");
     $.ajax({
       url: DATAREQUEST.url + "/update",
@@ -265,7 +251,44 @@ $("#btnActualizar").click(function actualizar() {
         alert("Error en actualizar cloud");
       },
     });
+  } catch (error) {
+    alert(`Error en usuario: ${error}`)  
   }
+  // if (!validar()) {
+  //   alert("Se deben llenar los campos.");
+  // } else if (
+  //   !validarMenor45Caracteres($("#name").val())) {
+  //   alert("Campo name no debe tener mas de 45 caracteres");
+  // } 
+  // else if (
+  //   !validarMenor45Caracteres($("#brand").val())) {
+  //   alert("Campo brand no debe tener mas de 45 caracteres");
+  // } 
+  // else if (!validarAnio($("#year").val())){
+  //   alert("Campo year debe ser un entero de 4 digitos");
+  // }
+  // else if (!validarMenor250Caracteres($("#description").val())){
+  //   alert("Campo description no debe tener mas de 250 caracteres");
+  // } else {
+  //   const data = organizarDatos("put");
+  //   $.ajax({
+  //     url: DATAREQUEST.url + "/update",
+  //     type: "PUT",
+  //     dataType: DATAREQUEST.dataType,
+  //     data: JSON.stringify(data),
+  //     contentType: DATAREQUEST.contentType,
+  //     statusCode: {
+  //       201: function () {
+  //         alert("La operacion fue exitosa");
+  //         limpiarCampos();
+  //         traerDatos();
+  //       },
+  //     },
+  //     error: function () {
+  //       alert("Error en actualizar cloud");
+  //     },
+  //   });
+  // }
 });
 
 /**
