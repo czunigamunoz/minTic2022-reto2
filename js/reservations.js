@@ -12,8 +12,7 @@ let ID_RESERVATION = null;
  */
 function limpiarCampos() {
   $("#status").val("");
-  $("#startDate").val("");
-  $("fechaFinal").val("");
+  $("#devolutionDate").val(getCurrentDate());
   $("#cloud").attr("disable", false);
   $("#client").attr("disable", false);
   $("#btnCrear").show();
@@ -38,12 +37,12 @@ function pintarElemento(response) {
 
     row.append(
       $("<td class='text-center no-padding'>").append(
-        `<button type="button" class="btn btn-outline-warning btn-block w-100" onclick="obtenerElemento(${element.idReservation})">Editar</button>`
+        `<button type="button" class="btn btn-warning btn-block w-100" onclick="obtenerElemento(${element.idReservation})">Editar</button>`
       )
     );
     row.append(
       $("<td class='text-center'>").append(
-        `<button type="button" class="btn btn-outline-danger btn-block w-100" onclick="eliminar(${element.idReservation})">Eliminar</button>`
+        `<button type="button" class="btn btn-danger btn-block w-100" onclick="eliminar(${element.idReservation})">Eliminar</button>`
       )
     );
     $("#contenidoTabla").append(row);
@@ -168,7 +167,7 @@ function validar() {
  * @returns True si date2 es posterior a date1
  */
 function validarFecha(date1, date2) {
-  return new Date(date2) > new Date(date1);
+  return new Date(date2) >= new Date(date1);
 }
 
 /**
@@ -205,6 +204,7 @@ async function traerDatos() {
     $("#startDate").val(getCurrentDate());
     $("#startDate").attr("disabled", true);
     $("#status").val("Creado").attr("disabled", true);
+    $("#devolutionDate").attr("min", getCurrentDate());
     inputCloud();
     inputClient();
     return response;

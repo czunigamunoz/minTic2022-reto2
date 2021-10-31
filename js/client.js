@@ -46,12 +46,12 @@ function pintarElemento(response) {
 
     row.append(
       $("<td class='text-center no-padding'>").append(
-        `<button type="button" class="btn btn-outline-warning btn-block w-100" onclick="obtenerElemento(${element.idClient})">Editar</button>`
+        `<button type="button" class="btn btn-warning btn-block w-100" onclick="obtenerElemento(${element.idClient})">Editar</button>`
       )
     );
     row.append(
       $("<td class='text-center'>").append(
-        `<button type="button" class="btn btn-outline-danger btn-block w-100" onclick="eliminar(${element.idClient})">Eliminar</button>`
+        `<button type="button" class="btn btn-danger btn-block w-100" onclick="eliminar(${element.idClient})">Eliminar</button>`
       )
     );
     $("#contenidoTabla").append(row);
@@ -134,7 +134,7 @@ $("#btnCrear").click(function crear() {
     if (!validar()) throw "Campos no deben estar vacios";
     if (!validarMenor45Caracteres($("#email").val())) throw "Campo email no debe tener mas de 45 caracteres";
     if (!validarMenor45Caracteres($("#password").val())) throw "Campo password no debe tener mas de 45 caracteres";
-    if (!validarCampoEdad($("#age").val())) throw "Campo age debe ser un entero de entre 0 y 120";
+    if (!validarCampoEdad($("#age").val())) throw "Campo age debe ser un entero entre 0 y 120";
     if (!validarMenor250Caracteres($("#name").val())) throw "Campo name no debe tener mas de 250 caracteres";
     const dataCategory = JSON.stringify(obtenerCampos());
     $.ajax({
@@ -167,7 +167,7 @@ $("#btnActualizar").click(function actualizar() {
     if (!validar()) throw "Campos no deben estar vacios";
     if (!validarMenor45Caracteres($("#email").val())) throw "Campo email no debe tener mas de 45 caracteres";
     if (!validarMenor45Caracteres($("#password").val())) throw "Campo password no debe tener mas de 45 caracteres";
-    if (!validarCampoEdad($("#age").val())) throw "Campo age debe ser un entero de entre 0 y 120";
+    if (!validarCampoEdad($("#age").val())) throw "Campo age debe ser un entero entre 0 y 120";
     if (!validarMenor250Caracteres($("#name").val())) throw "Campo name no debe tener mas de 250 caracteres";
     const dataCategory = obtenerCampos();
     const data = {

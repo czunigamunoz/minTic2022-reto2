@@ -37,12 +37,12 @@ function pintarElemento(response) {
 
     row.append(
       $("<td class='text-center no-padding'>").append(
-        `<button type="button" class="btn btn-outline-warning btn-block w-100" onclick="obtenerElemento(${element.id})">Editar</button>`
+        `<button type="button" class="btn btn-warning btn-block w-100" onclick="obtenerElemento(${element.id})">Editar</button>`
       )
     );
     row.append(
       $("<td class='text-center'>").append(
-        `<button type="button" class="btn btn-outline-danger btn-block w-100" onclick="eliminar(${element.id})">Eliminar</button>`
+        `<button type="button" class="btn btn-danger btn-block w-100" onclick="eliminar(${element.id})">Eliminar</button>`
       )
     );
     $("#contenidoTabla").append(row);
