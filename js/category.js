@@ -12,6 +12,7 @@ function limpiarCampos() {
   $("#name").val("");
   $("#description").val("");
   $("#btnCrear").show("slow");
+  $("#btnCancelar").hide("slow");
 }
 
 /**
@@ -28,7 +29,6 @@ function pintarElemento(response) {
     let divCloud = $("<div>").attr("class", "select-container");
     let selectCloud = $("<select>").attr("class", "select-item");
     element.clouds.forEach((cloud) => {
-      console.log(cloud);
       selectCloud.append(
         `<option value="${cloud.id}"> ${cloud.name} </option>`
       );
@@ -87,30 +87,41 @@ function validar() {
  */
 async function obtenerElemento(id) {
   try {
-    const response = await $.ajax({
+    const category = await $.ajax({
       url: DATAREQUEST.url + `/${id}`,
       type: "GET",
       dataType: DATAREQUEST.dataType,
     });
-    ID_CATEGORY = id;
-    setCampos(response);
+    ID_CATEGORY = category.id;
+    setCampos(category);
+    $("#btnActualizar").show("slow");
+    $("#btnCancelar").show("slow");
   } catch (error) {
     alert(`Hubo un problema trayendo los datos, Error: ${error.message}`);
   }
 }
 
 /**
+ * Funcion que esconde los botones de actualizar y cancelar y vuelve a mostrar el de crear
+ */
+ $("#btnCancelar").click(function () {
+  limpiarCampos();
+  $("#btnActualizar").hide("slow");
+});
+
+/**
  * Funcion que hace peticion GET al servicio REST
  */
 async function traerDatos() {
   try {
-    const response = await $.ajax({
+    const categories = await $.ajax({
       url: DATAREQUEST.url + "/all",
       type: "GET",
       dataType: DATAREQUEST.dataType,
     });
-    pintarElemento(response);
-    return response;
+    pintarElemento(categories);
+    $("#btnActualizar").hide();
+    $("#btnCancelar").hide();
   } catch (error) {
     console.error(
       `Hubo un problema trayendo los datos, Error: ${error.message}`

@@ -16,6 +16,7 @@ function limpiarCampos() {
   $("#cloud").attr("disable", false);
   $("#client").attr("disable", false);
   $("#btnCrear").show("slow");
+  $("#btnCancelar").hide("slow");
   inputCloud();
   inputClient();
 }
@@ -181,12 +182,22 @@ async function obtenerElemento(id) {
       type: "GET",
       dataType: DATAREQUEST.dataType,
     });
-    ID_RESERVATION = id;
+    ID_RESERVATION = reservation.idReservation;
     setCampos(reservation);
+    $("#btnActualizar").show("slow");
+    $("#btnCancelar").show("slow");
   } catch (error) {
     alert(`Hubo un problema trayendo los datos, Error: ${error.message}`);
   }
 }
+
+/**
+ * Funcion que esconde los botones de actualizar y cancelar y vuelve a mostrar el de crear
+ */
+ $("#btnCancelar").click(function () {
+  limpiarCampos();
+  $("#btnActualizar").hide("slow");
+});
 
 /**
  * Funcion que hace peticion GET al servicio REST
@@ -203,6 +214,8 @@ async function traerDatos() {
     $("#startDate").attr("disabled", true);
     $("#status").val("Creado").attr("disabled", true);
     $("#devolutionDate").attr("min", getCurrentDate());
+    $("#btnActualizar").hide();
+    $("#btnCancelar").hide();
     inputCloud();
     inputClient();
   } catch (error) {

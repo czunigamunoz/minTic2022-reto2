@@ -16,6 +16,7 @@ function limpiarCampos() {
   $("#description").val("");
   $("#category").attr("disabled", false);
   $("#btnCrear").show("slow");
+  $("#btnCancelar").hide("slow");
   inputCategory();
 }
 
@@ -136,24 +137,36 @@ async function obtenerElemento(id) {
       type: "GET",
       dataType: DATAREQUEST.dataType,
     });
-    ID_CLOUD = id;
+    ID_CLOUD = cloud.id;
     setCampos(cloud);
+    $("#btnActualizar").show("slow");
+    $("#btnCancelar").show("slow");
   } catch (error) {
     console.error(`Hubo un problema trayendo los datos de cloud, Error: ${error.message}`);
   }
 }
 
 /**
+ * Funcion que esconde los botones de actualizar y cancelar y vuelve a mostrar el de crear
+ */
+ $("#btnCancelar").click(function () {
+  limpiarCampos();
+  $("#btnActualizar").hide("slow");
+});
+
+/**
  * Funcion que hace peticion GET al servicio REST
  */
 async function traerDatos() {
   try {
-    const categories = await $.ajax({
+    const clouds = await $.ajax({
       url: DATAREQUEST.url + "/all",
       type: "GET",
       dataType: DATAREQUEST.dataType,
     });
-    pintarElemento(categories);
+    pintarElemento(clouds);
+    $("#btnActualizar").hide();
+    $("#btnCancelar").hide();
   } catch (error) {
     alert(`Hubo un problema trayendo los datos, Error: ${error.message}`);
   }
