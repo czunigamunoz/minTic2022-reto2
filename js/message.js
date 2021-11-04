@@ -75,68 +75,6 @@ function setCampos(data) {
 }
 
 /**
- * Funcion que trae todos los elementos de la tabla CLOUD
- * y los pinta en el select de cloud
- */
-async function inputCloud() {
-  try {
-    const clouds = await $.ajax({
-      url: URL_CLOUD,
-      type: "GET",
-      dataType: DATAREQUEST.dataType,
-    });
-    $("#cloud").empty();
-    $("#cloud").append('<option value="0"> Seleccionar Cloud</option>');
-    clouds.forEach((cloud) => {
-      const option = $("<option>");
-      option.attr("value", cloud.id);
-      option.text(cloud.name);
-      $("#cloud").append(option);
-    });
-  } catch (error) {
-    console.error(
-      `Hubo un problema trayendo los datos de cloud, Error: ${error.message}`
-    );
-  }
-}
-
-/**
- * Funcion que trae todos los elementos de la tabla CLIENT
- * y los pinta en el select de client
- */
-async function inputClient() {
-  try {
-    const clients = await $.ajax({
-      url: URL_CLIENT,
-      type: "GET",
-      dataType: DATAREQUEST.dataType,
-    });
-    $("#client").empty();
-    $("#client").append('<option value="0"> Seleccionar Client</option>');
-    clients.forEach((client) => {
-      const option = $("<option>");
-      option.attr("value", client.idClient);
-      option.text(client.name);
-      $("#client").append(option);
-    });
-  } catch (error) {
-    console.error(
-      `Hubo un problema trayendo los datos de client, Error: ${error.message}`
-    );
-  }
-}
-
-/**
- * Funcion para validar que los campos no esten vacios
- */
-function validar() {
-  const elements = document.querySelectorAll(".form input");
-  const selectElements = document.querySelectorAll(".form select");
-
-  return validarCamposVacios(elements) && validarCamposVacios(selectElements);
-}
-
-/**
  * Funcion que trae los datos de un mensaje por id
  * @param {number} id de mensaje
  */
@@ -215,7 +153,7 @@ function organizarDatos(typeMethod) {
  */
 $("#btnCrear").click(function crear() {
   try {
-    if (!validar()) throw "Campos no deben estar vacios";
+    if (!validarCamposVacios($(".form input"))) throw "Campos no deben estar vacios";
     if (!validarMenor250Caracteres($("#messageText").val())) throw "Campo message no debe tener mas de 250 caracteres";
     if ($("#cloud").val() === "0") throw "Debe seleccionar una cloud";
     if ($("#client").val() === "0") throw "Debe seleccionar una client";
@@ -247,7 +185,7 @@ $("#btnCrear").click(function crear() {
  */
 $("#btnActualizar").click(function actualizar() {
   try {
-    if (!validar()) throw "Campos no deben estar vacios";
+    if (!validarCamposVacios($(".form input"))) throw "Campos no deben estar vacios";
     if (!validarMenor250Caracteres($("#messageText").val())) throw "Campo message no debe tener mas de 250 caracteres";
     const data = organizarDatos("put");
     $.ajax({

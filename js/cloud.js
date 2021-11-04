@@ -95,38 +95,6 @@ function setCampos(data) {
 }
 
 /**
- * Funcion que trae todos los elementos de la tabla CATEGORY
- * y los pinta en el select de category
- */
-async function inputCategory() {
-  try {
-    const categories = await $.ajax({
-      url: URL_CATEGORY,
-      type: "GET",
-      dataType: DATAREQUEST.dataType,
-    });
-    $("#category").empty();
-    $("#category").append('<option value="0"> Seleccionar Categoria</option>');
-    categories.forEach(category => {
-      const option = $("<option>")
-      option.attr("value", category.id);
-      option.text(category.name);
-      $("#category").append(option);  
-    });  
-  } catch (error) {
-    console.error(`Hubo un problema trayendo los datos de category, Error: ${error.message}`);
-  }  
-}
-
-/**
- * Funcion para validar que los campos no esten vacios
- */
-function validar() {
-  const elements = document.querySelectorAll(".form input");
-  return validarCamposVacios(elements);
-}
-
-/**
  * Funcion que trae los datos de una cloud por id
  * @param {number} id de cloud
  */
@@ -207,7 +175,7 @@ function organizarDatos(typeMethod) {
  */
 $("#btnCrear").click(function crear() {
   try {
-    if (!validar()) throw "Campos no deben estar vacios";
+    if (!validarCamposVacios($(".form input"))) throw "Campos no deben estar vacios";
     if (!validarMenor45Caracteres($("#name").val())) throw "Campo name no debe tener mas de 45 caracteres";
     if (!validarMenor45Caracteres($("#brand").val())) throw "Campo brand no debe tener mas de 45 caracteres";
     if (!validarAnio($("#year").val())) throw "Campo year debe ser un entero de 4 digitos";
@@ -241,7 +209,7 @@ $("#btnCrear").click(function crear() {
  */
 $("#btnActualizar").click(function actualizar() {
   try {
-    if (!validar()) throw "Campos no deben estar vacios" ;
+    if (!validarCamposVacios($(".form input"))) throw "Campos no deben estar vacios" ;
     if (!validarMenor45Caracteres($("#name").val())) throw "Campo name no debe tener mas de 45 caracteres" ;
     if (!validarMenor45Caracteres($("#brand").val())) throw "Campo brand no debe tener mas de 45 caracteres";
     if (!validarAnio($("#year").val())) throw "Campo year debe ser un entero de 4 digitos";
@@ -267,41 +235,6 @@ $("#btnActualizar").click(function actualizar() {
   } catch (error) {
     alert(`Error en usuario: ${error}`)  
   }
-  // if (!validar()) {
-  //   alert("Se deben llenar los campos.");
-  // } else if (
-  //   !validarMenor45Caracteres($("#name").val())) {
-  //   alert("Campo name no debe tener mas de 45 caracteres");
-  // } 
-  // else if (
-  //   !validarMenor45Caracteres($("#brand").val())) {
-  //   alert("Campo brand no debe tener mas de 45 caracteres");
-  // } 
-  // else if (!validarAnio($("#year").val())){
-  //   alert("Campo year debe ser un entero de 4 digitos");
-  // }
-  // else if (!validarMenor250Caracteres($("#description").val())){
-  //   alert("Campo description no debe tener mas de 250 caracteres");
-  // } else {
-  //   const data = organizarDatos("put");
-  //   $.ajax({
-  //     url: DATAREQUEST.url + "/update",
-  //     type: "PUT",
-  //     dataType: DATAREQUEST.dataType,
-  //     data: JSON.stringify(data),
-  //     contentType: DATAREQUEST.contentType,
-  //     statusCode: {
-  //       201: function () {
-  //         alert("La operacion fue exitosa");
-  //         limpiarCampos();
-  //         traerDatos();
-  //       },
-  //     },
-  //     error: function () {
-  //       alert("Error en actualizar cloud");
-  //     },
-  //   });
-  // }
 });
 
 /**

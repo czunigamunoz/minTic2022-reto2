@@ -73,15 +73,6 @@ function setCampos(data) {
 }
 
 /**
- * Funcion para validar que los campos no esten vacios
- */
-function validar() {
-  const elements = document.querySelectorAll(".form input");
-
-  return validarCamposVacios(elements);
-}
-
-/**
  * Funcion que trae los datos de una categoria por id
  * @param {number} id de categoria
  */
@@ -134,7 +125,7 @@ async function traerDatos() {
  */
 $("#btnCrear").click(function crear() {
   try {
-    if (!validar()) throw "Campos no deben estar vacios";
+    if (!validarCamposVacios($(".form input"))) throw "Campos no deben estar vacios";
     if (!validarMenor45Caracteres($("#name").val())) throw "Campo name no debe tener mas de 45 caracteres";
     if (!validarMenor250Caracteres($("#description").val())) throw "Campo description no debe tener mas de 250 caracteres";
     const newData = obtenerCampos();
@@ -169,7 +160,7 @@ $("#btnCrear").click(function crear() {
  */
 $("#btnActualizar").click(function actualizar() {
   try {
-    if (!validar()) throw "Campos no deben estar vacios";
+    if (!validarCamposVacios($(".form input"))) throw "Campos no deben estar vacios";
     if (!validarMenor45Caracteres($("#name").val())) throw "Campo name no debe tener mas de 45 caracteres";
     if (!validarMenor250Caracteres($("#description").val())) throw "Campo description no debe tener mas de 250 caracteres";
     const dataCategory = obtenerCampos();

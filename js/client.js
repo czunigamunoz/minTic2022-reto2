@@ -87,14 +87,6 @@ function setCampos(data) {
 }
 
 /**
- * Funcion para validar que los campos no esten vacios
- */
-function validar() {
-  const elements = document.querySelectorAll(".form input");
-  return validarCamposVacios(elements);
-}
-
-/**
  * Funcion que trae los datos de un cliente por id
  * @param {number} id de cliente
  */
@@ -145,7 +137,7 @@ async function traerDatos() {
  */
 $("#btnCrear").click(function crear() {
   try {
-    if (!validar()) throw "Campos no deben estar vacios";
+    if (!validarCamposVacios($(".form input"))) throw "Campos no deben estar vacios";
     if (!validarMenor45Caracteres($("#email").val())) throw "Campo email no debe tener mas de 45 caracteres";
     if (!validarMenor45Caracteres($("#password").val())) throw "Campo password no debe tener mas de 45 caracteres";
     if (!validarCampoEdad($("#age").val())) throw "Campo age debe ser un entero entre 0 y 120";
@@ -178,7 +170,7 @@ $("#btnCrear").click(function crear() {
  */
 $("#btnActualizar").click(function actualizar() {
   try {
-    if (!validar()) throw "Campos no deben estar vacios";
+    if (!validarCamposVacios($(".form input"))) throw "Campos no deben estar vacios";
     if (!validarMenor45Caracteres($("#email").val())) throw "Campo email no debe tener mas de 45 caracteres";
     if (!validarMenor45Caracteres($("#password").val())) throw "Campo password no debe tener mas de 45 caracteres";
     if (!validarCampoEdad($("#age").val())) throw "Campo age debe ser un entero entre 0 y 120";

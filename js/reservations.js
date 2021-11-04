@@ -128,40 +128,6 @@ async function inputCloud() {
 }
 
 /**
- * Funcion que trae todos los elementos de la tabla CLIENT
- * y los pinta en el select de client
- */
-async function inputClient() {
-  try {
-    const clients = await $.ajax({
-      url: URL_CLIENT,
-      type: "GET",
-      dataType: DATAREQUEST.dataType
-    });
-    $("#client").empty();
-    $("#client").append('<option value="0"> Seleccionar Client</option>');
-    clients.forEach(client => {
-      const option = $("<option>")
-      option.attr("value", client.idClient);
-      option.text(client.name);
-      $("#client").append(option);
-    });
-  } catch (error) {
-    console.error(`Hubo un problema trayendo los datos de client, Error: ${error.message}`);
-  }
-}
-
-/**
- * Funcion para validar que los campos no esten vacios
- */
-function validar() {
-  const elements = document.querySelectorAll(".form input");
-  const selectElements = document.querySelectorAll(".form select");
-
-  return validarCamposVacios(elements) && validarCamposVacios(selectElements);
-}
-
-/**
  * Funcion para validar la fecha
  * @param {Date} date1 Fecha de inicio
  * @param {Date} date2 Fecha final
@@ -261,7 +227,7 @@ function organizarDatos(typeMethod) {
  */
 $("#btnCrear").click(function crear() {
   try {
-    if (!validar()) throw "Campos no deben estar vacios";
+    if (!validarCamposVacios($(".form input"))) throw "Campos no deben estar vacios";
     if (!validarFecha($("#startDate").val(), $("#devolutionDate").val())) throw "La fecha de inicio debe ser anterior a la fecha final";
     if ($("#cloud").val() === "0") throw "Debe seleccionar una cloud";
     if ($("#client").val() === "0") throw "Debe seleccionar un client";
@@ -293,7 +259,7 @@ $("#btnCrear").click(function crear() {
  */
 $("#btnActualizar").click(function actualizar() {
   try {
-    if (!validar()) throw "Campos no deben estar vacios";
+    if (!validarCamposVacios($(".form input"))) throw "Campos no deben estar vacios";
     if (!validarFecha($("#startDate").val(), $("#devolutionDate").val())) throw "La fecha de inicio debe ser anterior a la fecha final";
     if ($("#status").val() === "Seleccionar Status") throw "Debe seleccionar un status";
     const data = organizarDatos("put");
