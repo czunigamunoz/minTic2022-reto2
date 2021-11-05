@@ -1,9 +1,9 @@
 const DATAREQUEST = {
-  url: "http://localhost:8080/api/Client",
+  url: "http://localhost:8080/api/Admin",
   dataType: "json",
   contentType: "application/json; charset=utf-8",
 };
-let ID_CLIENT = null;
+let ID_ADMIN = null;
 
 /**
  * Funcion que limpia los campos del formulario
@@ -12,7 +12,6 @@ function limpiarCampos() {
   $("#name").val("");
   $("#email").val("");
   $("#password").val("");
-  $("#age").val("");
   $("#btnCrear").show("slow");
   $("#btnCancelar").hide("slow");
 }
@@ -27,32 +26,15 @@ function pintarElemento(response) {
     let row = $("<tr>");
     row.append($("<td>").text(element.email));
     row.append($("<td>").text(element.name));
-    row.append($("<td>").text(element.age));
-
-    let divMessage = $("<div>").attr("class", "select-container");
-    let selectMessage = $("<select>").attr("class", "select-item");
-    element.messages.forEach((message) => {
-      selectMessage.append(`<option value="${message.idMessage}"> ${message.messageText} </option>`);
-    });
-    divMessage.append(selectMessage);
-    row.append($("<td>").append(divMessage));
-
-    let divReservation = $("<div>").attr("class", "select-container");
-    let selectReservation = $("<select>").attr("class", "select-item");
-    element.reservations.forEach((reservation) => {
-      selectReservation.append(`<option value="${reservation.idReservation}"> ${reservation.idReservation} </option>`)
-    });
-    divReservation.append(selectReservation);
-    row.append($("<td>").append(divReservation));
 
     row.append(
       $("<td class='text-center no-padding'>").append(
-        `<button type="button" class="btn btn-warning btn-block w-100" onclick="obtenerElemento(${element.idClient})">Editar</button>`
+        `<button type="button" class="btn btn-warning btn-block w-100" onclick="obtenerElemento(${element.idAdmin})">Editar</button>`
       )
     );
     row.append(
       $("<td class='text-center'>").append(
-        `<button type="button" class="btn btn-danger btn-block w-100" onclick="eliminar(${element.idClient})">Eliminar</button>`
+        `<button type="button" class="btn btn-danger btn-block w-100" onclick="eliminar(${element.idAdmin})">Eliminar</button>`
       )
     );
     $("#contenidoTabla").append(row);
@@ -68,7 +50,6 @@ function obtenerCampos() {
     name: $("#name").val(),
     email: $("#email").val(),
     password: $("#password").val(),
-    age: $("#age").val(),
   };
   return data;
 }
@@ -81,23 +62,22 @@ function setCampos(data) {
   $("#name").val(data.name);
   $("#email").val(data.email).attr("readonly", "true");
   $("#password").val(data.password);
-  $("#age").val(data.age);
   $("#btnCrear").hide("slow");
 }
 
 /**
  * Funcion que trae los datos de un cliente por id
- * @param {number} id de cliente
+ * @param {number} id de admin
  */
 async function obtenerElemento(id) {
   try {
-    const client = await $.ajax({
+    const admin = await $.ajax({
       url: DATAREQUEST.url + `/${id}`,
       type: "GET",
       dataType: DATAREQUEST.dataType,
     });
-    ID_CLIENT = client.idClient;
-    setCampos(client);
+    ID_ADMIN = admin.idAdmin;
+    setCampos(admin);
     $("#btnActualizar").show("slow");
     $("#btnCancelar").show("slow");
   } catch (error) {
@@ -118,35 +98,40 @@ $("#btnCancelar").click(function () {
  */
 async function traerDatos() {
   try {
-      const clients = await $.ajax({
+    const admins = await $.ajax({
       url: DATAREQUEST.url + "/all",
       type: "GET",
       dataType: DATAREQUEST.dataType,
     });
-    pintarElemento(clients);
+    pintarElemento(admins);
     $("#btnActualizar").hide();
     $("#btnCancelar").hide();
   } catch (error) {
-    console.error(`Hubo un problema trayendo los datos, Error: ${error.message}`);
+    console.error(
+      `Hubo un problema trayendo los datos, Error: ${error.message}`
+    );
   }
 }
 
 /**
- * Funcion para crear un nuevo campo a la tabla CLIENT
+ * Funcion para crear un nuevo campo a la tabla ADMIN
  */
 $("#btnCrear").click(function crear() {
   try {
-    if (!validarCamposVacios($(".form input"))) throw "Campos no deben estar vacios";
-    if (!validarMenor45Caracteres($("#email").val())) throw "Campo email no debe tener mas de 45 caracteres";
-    if (!validarMenor45Caracteres($("#password").val())) throw "Campo password no debe tener mas de 45 caracteres";
-    if (!validarCampoEdad($("#age").val())) throw "Campo age debe ser un entero entre 0 y 120";
-    if (!validarMenor250Caracteres($("#name").val())) throw "Campo name no debe tener mas de 250 caracteres";
-    const client = JSON.stringify(obtenerCampos());
+    if (!validarCamposVacios($(".form input")))
+      throw "Campos no deben estar vacios";
+    if (!validarMenor45Caracteres($("#email").val()))
+      throw "Campo email no debe tener mas de 45 caracteres";
+    if (!validarMenor45Caracteres($("#password").val()))
+      throw "Campo password no debe tener mas de 45 caracteres";
+    if (!validarMenor250Caracteres($("#name").val()))
+      throw "Campo name no debe tener mas de 250 caracteres";
+    const dataCategory = JSON.stringify(obtenerCampos());
     $.ajax({
       url: DATAREQUEST.url + "/save",
       type: "POST",
       dataType: DATAREQUEST.dataType,
-      data: client,
+      data: dataCategory,
       contentType: DATAREQUEST.contentType,
       statusCode: {
         201: function () {
@@ -157,10 +142,10 @@ $("#btnCrear").click(function crear() {
       },
       error: function () {
         alert("Error en crear client");
-      }
-    });  
+      },
+    });
   } catch (error) {
-    alert(`Error en usuario: ${error}`)
+    alert(`Error en usuario: ${error}`);
   }
 });
 
@@ -169,18 +154,20 @@ $("#btnCrear").click(function crear() {
  */
 $("#btnActualizar").click(function actualizar() {
   try {
-    if (!validarCamposVacios($(".form input"))) throw "Campos no deben estar vacios";
-    if (!validarMenor45Caracteres($("#email").val())) throw "Campo email no debe tener mas de 45 caracteres";
-    if (!validarMenor45Caracteres($("#password").val())) throw "Campo password no debe tener mas de 45 caracteres";
-    if (!validarCampoEdad($("#age").val())) throw "Campo age debe ser un entero entre 0 y 120";
-    if (!validarMenor250Caracteres($("#name").val())) throw "Campo name no debe tener mas de 250 caracteres";
-    const client = obtenerCampos();
+    if (!validarCamposVacios($(".form input")))
+      throw "Campos no deben estar vacios";
+    if (!validarMenor45Caracteres($("#email").val()))
+      throw "Campo email no debe tener mas de 45 caracteres";
+    if (!validarMenor45Caracteres($("#password").val()))
+      throw "Campo password no debe tener mas de 45 caracteres";
+    if (!validarMenor250Caracteres($("#name").val()))
+      throw "Campo name no debe tener mas de 250 caracteres";
+    const admin = obtenerCampos();
     const data = {
-      idClient: ID_CLIENT,
-      name: client.name,
-      email: client.email,
-      password: client.password,
-      age: client.age,
+      idAdmin: ID_ADMIN,
+      name: admin.name,
+      email: admin.email,
+      password: admin.password,
     }; // Se crea un objeto con los datos a actualizar.
     $.ajax({
       url: DATAREQUEST.url + "/update",
@@ -191,17 +178,17 @@ $("#btnActualizar").click(function actualizar() {
       statusCode: {
         201: function () {
           alert("La operacion fue exitosa");
-          $("#email").val(data.email).attr("readonly", false);
+          $("#email").val(admin.email).attr("readonly", false);
           limpiarCampos();
           traerDatos();
         },
       },
       error: function () {
         alert("Error en actualizar client");
-      }
+      },
     });
   } catch (error) {
-    alert(`Error en usuario: ${error}`)
+    alert(`Error en usuario: ${error}`);
   }
 });
 
@@ -226,10 +213,30 @@ function eliminar(id) {
       },
       error: function () {
         alert("Error en eliminar client");
-      }
+      },
     });
   }
 }
+
+$("#btnClientes").click(async () => {
+  const clients = await $.ajax({
+    url: "http://localhost:8080/api/Client/all",
+    type: "GET",
+    dataType: DATAREQUEST.dataType,
+  });
+  $("#listaClientes").empty();
+  clients.forEach((client) => {
+    $("#listaClientes").append(
+        `<div  class="card text-white bg-light w-100" style="height: 8rem;">
+            <div class="card-body mb-3">
+                <h5 class="card-title">${client.name}</h5>
+                <p class="card-text m-0">Email: ${client.email}</p>
+                <p class="card-text m-0">Age: ${client.age}</p>
+            </div>
+        </div>`
+        );
+  });
+});
 
 /**
  * Cuando el HTML carga manda a llamar a la funcion

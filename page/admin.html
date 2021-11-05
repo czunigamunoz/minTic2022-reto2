@@ -8,15 +8,15 @@
     <meta name="keywords" content="MinTic, Cloud, Reservation">
     <meta name="description" content="Cloud clients">
     <meta name="author" content="Carlos Zúñga Muñoz">
-    <title>Client</title>
+    <title>Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-uWxY/CJNBR+1zjPWmfnSnVxwRheevXITnMqoEIeG1LJrdI0GlVs/9cVSyPYXdcSF" crossorigin="anonymous">
     <link rel="stylesheet" href="../css/styles.css">
 </head>
 
 <body>
-    <a href="../page/clientfun.html" class="btn-atras">Atras</a>
-    <h1 class="text-center mt-2">Formulario CLIENT</h1>
+    <a href="../page/adminfun.html" class="btn-atras">Atras</a>
+    <h1 class="text-center mt-2">Formulario ADMIN</h1>
     <div class="container-fluid mt-3">
         <section class="container d-flex justify-content-center">
 
@@ -34,20 +34,44 @@
                     <label for="name">Name</label>
                     <input class="form-control form-control-sm" type="text" placeholder="Name" id="name">
                 </div>
-                <div class="row mt-2">
-                    <label for="age">Age</label>
-                    <input class="form-control form-control-sm" type="number" placeholder="Age" id="age">
-                </div>
 
                 <div class="d-flex justify-content-around m-3 btn__container">
                     <button type="button" class="btn btn-success btn-block" id="btnCrear">Crear</button>
                     <button type="button" class="btn btn-warning" id="btnActualizar">Actualizar</button>
                     <button type="button" class="btn btn-dark" id="btnCancelar">Cancelar</button>
                 </div>
+                <div class="row m-2">
+                    <button id="btnClientes" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        Listar Clientes
+                    </button>
+                </div>
 
             </div>
 
         </section>
+
+        <!-- Modal -->
+        <div class="modal fade modal-dialog-scrollable" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div id="listaClientes" class="modal-body">
+
+                        <!-- <div  class="card text-white bg-light w-100" style="height: 8rem;">
+
+
+                        </div> -->
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <br />
 
@@ -57,9 +81,6 @@
                     <tr>
                         <th>Email</th>
                         <th>Name</th>
-                        <th>Age</th>
-                        <th>Messages</th>
-                        <th>Reservations</th>
                         <th colspan="2">Accion</th>
                     </tr>
                 </thead>
@@ -76,7 +97,7 @@
         integrity="sha384-kQtW33rZJAHjgefvhyyzcGF3C5TFyBQBA13V1RKPf4uH+bwyzQxZ6CmMZHmNBEfJ"
         crossorigin="anonymous"></script>
     <script src="../js/utils.js"></script>
-    <script src="../js/client.js"></script>
+    <script src="../js/admin.js"></script>
 </body>
 
 </html>
