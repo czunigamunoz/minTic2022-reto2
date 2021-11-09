@@ -27,6 +27,10 @@ function validarCampoEdad(entrada) {
   return entrada > 0 && entrada < 120;
 }
 
+function validarCalificacion(calificacion) {
+  return calificacion >= 0 && calificacion <= 5;
+}
+
 /**
  * Funcion que trae todos los elementos de la tabla CATEGORY
  * y los pinta en el select de category

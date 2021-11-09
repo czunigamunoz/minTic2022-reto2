@@ -5,6 +5,7 @@ const DATAREQUEST = {
 };
 const URL_CLOUD = "http://localhost:8080/api/Cloud/all";
 const URL_CLIENT = "http://localhost:8080/api/Client/all";
+const URL_SCORE = "http://localhost:8080/api/Score";
 let ID_RESERVATION = null;
 
 /**
@@ -34,7 +35,97 @@ function pintarElemento(response) {
     row.append($("<td>").text(element.devolutionDate.split("T")[0]));
     row.append($("<td>").text(element.status));
     row.append($("<td>").text(element.cloud.name));
-    row.append($("<td>").text(element.client.name));
+
+    row.append($("<td>").append(
+      ` <div>
+          <p>Id Cliente: ${element.client.idClient}</p>
+          <p>Nombre: ${element.client.name}</p>
+          <p>Email: ${element.client.email}</p>
+        </div>
+      `
+    ));
+
+    if (!!element.score){
+      row.append($("<td>").append(
+        `
+          <div>
+            <p> Calificacion: ${element.score.stars}
+            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#scoreModalEdit${element.idReservation}">
+            Editar
+          </button>
+
+          <!-- Modal -->
+        <div class="modal fade modal-dialog-scrollable" id="scoreModalEdit${element.idReservation}" tabindex="-1" aria-labelledby="score Modal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Score</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+                      <div>
+                        <div class="mb-3">
+                          <label for="start" class="col-form-label fw-bolder">Stars: <small class="fw-light">Range 0 - 5</small></label>
+                          <input type="number" class="form-control" id="scoreStarsEdit${element.idReservation}" value="${element.score.stars}">
+                        </div>
+                        <div class="mb-3">
+                          <label for="scoreMessage" class="col-form-label fw-bolder">Message</label>
+                          <textarea class="form-control" id="scoreMessageEdit${element.idReservation}">${element.score.messageText}</textarea>
+                        </div>
+                      </div>
+
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                      <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="actualizarScore(${element.score.idScore},${element.idReservation})">Actualizar Score</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+          </div>
+        `))
+
+    } else {
+      row.append(
+        $("<td class='no-padding'>").append(
+          `<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#scoreModal${element.idReservation}">
+            Calificar
+          </button>
+
+          <!-- Modal -->
+        <div class="modal fade modal-dialog-scrollable" id="scoreModal${element.idReservation}" tabindex="-1" aria-labelledby="score Modal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Score</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+                      <div>
+                        <div class="mb-3">
+                          <label for="start" class="col-form-label fw-bolder">Stars: <small class="fw-light">Range 0 - 5</small></label>
+                          <input type="number" class="form-control" id="scoreStars${element.idReservation}">
+                        </div>
+                        <div class="mb-3">
+                          <label for="scoreMessage" class="col-form-label fw-bolder">Message</label>
+                          <textarea class="form-control" id="scoreMessage${element.idReservation}"></textarea>
+                        </div>
+                      </div>
+
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                      <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="crearScore(${element.idReservation})">Guardar Score</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+          `
+        )
+      );
+    }
 
     row.append(
       $("<td class='text-center no-padding'>").append(
@@ -307,6 +398,68 @@ function eliminar(id) {
         alert("Error en eliminar reservation");
       },
     });
+  }
+}
+
+function crearScore(id) {
+  const data = {
+    messageText: $(`#scoreMessage${id}`).val(),
+    stars: Number.parseInt($(`#scoreStars${id}`).val()),
+    reservation: { idReservation: id }
+  }
+  try {
+    if (!validarCalificacion($(`#scoreStars${id}`).val())) throw "Calificacion debe estar entre 0 y 5";
+    if (!validarMenor250Caracteres($(`#scoreMessage${id}`).val())) throw "Mensaje no debe contener mas de 250 caracteres";
+    $.ajax({
+      url: URL_SCORE + "/save",
+      type: "POST",
+      dataType: DATAREQUEST.dataType,
+      data: JSON.stringify(data),
+      contentType: DATAREQUEST.contentType,
+      statusCode: {
+        201: function () {
+          alert("Se agrego de manera exitosa");
+          traerDatos();
+        },
+      },
+      error: function () {
+        alert("Error en crear score");
+      }
+    });  
+  } catch (error) {
+    alert(`Error en usuario: ${error}`);
+  }
+}
+
+function actualizarScore(idScore, idReservation){
+  const data = {
+    idScore: idScore,
+    messageText: $(`#scoreMessageEdit${idReservation}`).val(),
+    stars: Number.parseInt($(`#scoreStarsEdit${idReservation}`).val()),
+    reservation: { idReservation: idReservation }    
+  }
+  console.log(data)
+  try {
+    if (!validarCalificacion($(`#scoreStarsEdit${idReservation}`).val())) throw "Calificacion debe estar entre 0 y 5";
+    if (!validarMenor250Caracteres($(`#scoreMessageEdit${idReservation}`).val())) throw "Mensaje no debe contener mas de 250 caracteres";
+    $.ajax({
+      url: URL_SCORE + "/update",
+      type: "PUT",
+      dataType: DATAREQUEST.dataType,
+      data: JSON.stringify(data),
+      contentType: DATAREQUEST.contentType,
+      statusCode: {
+        201: function () {
+          alert("Se actualizo de manera exitosa");
+          traerDatos();
+        },
+      },
+      error: function () {
+        alert("Error en actualizar score");
+      }
+    });  
+  } catch (error) {
+    alert(`Error en usuario: ${error}`);
   }
 }
 
