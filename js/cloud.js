@@ -37,7 +37,9 @@ function pintarElemento(response) {
     let divMessage = $("<div>").attr("class", "select-container");
     let selectMessage = $("<select>").attr("class", "select-item");
     element.messages.forEach((message) => {
-      selectMessage.append(`<option value="${message.idMessage}"> ${message.messageText} </option>`);
+      selectMessage.append(
+        `<option value="${message.idMessage}"> ${message.messageText} </option>`
+      );
     });
     divMessage.append(selectMessage);
     row.append($("<td>").append(divMessage));
@@ -45,7 +47,9 @@ function pintarElemento(response) {
     let divReservation = $("<div>").attr("class", "select-container");
     let selectReservation = $("<select>").attr("class", "select-item");
     element.reservations.forEach((reservation) => {
-      selectReservation.append(`<option value="${reservation.idReservation}"> ${reservation.idReservation} </option>`)
+      selectReservation.append(
+        `<option value="${reservation.idReservation}"> ${reservation.idReservation} </option>`
+      );
     });
     divReservation.append(selectReservation);
     row.append($("<td>").append(divReservation));
@@ -89,7 +93,9 @@ function setCampos(data) {
   $("#year").val(data.year);
   $("#description").val(data.description);
   $("#category").empty();
-  $("#category").append(`<option value="${data.category.id}"> ${data.category.name}</option>`);
+  $("#category").append(
+    `<option value="${data.category.id}"> ${data.category.name}</option>`
+  );
   $("#category").attr("disabled", true);
   $("#btnCrear").hide("slow");
 }
@@ -110,14 +116,16 @@ async function obtenerElemento(id) {
     $("#btnActualizar").show("slow");
     $("#btnCancelar").show("slow");
   } catch (error) {
-    console.error(`Hubo un problema trayendo los datos de cloud, Error: ${error.message}`);
+    console.error(
+      `Hubo un problema trayendo los datos de cloud, Error: ${error.message}`
+    );
   }
 }
 
 /**
  * Funcion que esconde los botones de actualizar y cancelar y vuelve a mostrar el de crear
  */
- $("#btnCancelar").click(function () {
+$("#btnCancelar").click(function () {
   limpiarCampos();
   $("#btnActualizar").hide("slow");
 });
@@ -175,12 +183,17 @@ function organizarDatos(typeMethod) {
  */
 $("#btnCrear").click(function crear() {
   try {
-    if (!validarCamposVacios($(".form input"))) throw "Campos no deben estar vacios";
-    if (!validarMenor45Caracteres($("#name").val())) throw "Campo name no debe tener mas de 45 caracteres";
-    if (!validarMenor45Caracteres($("#brand").val())) throw "Campo brand no debe tener mas de 45 caracteres";
-    if (!validarAnio($("#year").val())) throw "Campo year debe ser un entero de 4 digitos";
-    if (!validarMenor250Caracteres($("#description").val())) throw "Campo description no debe tener mas de 250 caracteres";
-    if ($("#category").val() === '0') throw "Debe seleccionar una categoria";
+    if (!validarCamposVacios($(".form input")))
+      throw "Campos no deben estar vacios";
+    if (!validarMenor45Caracteres($("#name").val()))
+      throw "Campo name no debe tener mas de 45 caracteres";
+    if (!validarMenor45Caracteres($("#brand").val()))
+      throw "Campo brand no debe tener mas de 45 caracteres";
+    if (!validarAnio($("#year").val()))
+      throw "Campo year debe ser un entero de 4 digitos";
+    if (!validarMenor250Caracteres($("#description").val()))
+      throw "Campo description no debe tener mas de 250 caracteres";
+    if ($("#category").val() === "0") throw "Debe seleccionar una categoria";
     const data = organizarDatos("post");
     $.ajax({
       url: DATAREQUEST.url + "/save",
@@ -200,7 +213,7 @@ $("#btnCrear").click(function crear() {
       },
     });
   } catch (error) {
-    alert(`Error en usuario: ${error}`); 
+    alert(`Error en usuario: ${error}`);
   }
 });
 
@@ -209,11 +222,16 @@ $("#btnCrear").click(function crear() {
  */
 $("#btnActualizar").click(function actualizar() {
   try {
-    if (!validarCamposVacios($(".form input"))) throw "Campos no deben estar vacios" ;
-    if (!validarMenor45Caracteres($("#name").val())) throw "Campo name no debe tener mas de 45 caracteres" ;
-    if (!validarMenor45Caracteres($("#brand").val())) throw "Campo brand no debe tener mas de 45 caracteres";
-    if (!validarAnio($("#year").val())) throw "Campo year debe ser un entero de 4 digitos";
-    if (!validarMenor250Caracteres($("#description").val())) throw "Campo description no debe tener mas de 250 caracteres";
+    if (!validarCamposVacios($(".form input")))
+      throw "Campos no deben estar vacios";
+    if (!validarMenor45Caracteres($("#name").val()))
+      throw "Campo name no debe tener mas de 45 caracteres";
+    if (!validarMenor45Caracteres($("#brand").val()))
+      throw "Campo brand no debe tener mas de 45 caracteres";
+    if (!validarAnio($("#year").val()))
+      throw "Campo year debe ser un entero de 4 digitos";
+    if (!validarMenor250Caracteres($("#description").val()))
+      throw "Campo description no debe tener mas de 250 caracteres";
     const data = organizarDatos("put");
     $.ajax({
       url: DATAREQUEST.url + "/update",
@@ -233,7 +251,7 @@ $("#btnActualizar").click(function actualizar() {
       },
     });
   } catch (error) {
-    alert(`Error en usuario: ${error}`)  
+    alert(`Error en usuario: ${error}`);
   }
 });
 
@@ -241,25 +259,35 @@ $("#btnActualizar").click(function actualizar() {
  * Funcion para eliminar dato de CLOUD
  * @param {id} id del elemento a eliminar
  */
-function eliminar(id) {
-  const r = confirm("Segur@ de eliminar la Cloud"); // Se pregunta si está seguro de eliminar.
-  if (r == true) {
-    //Si está seguro, se procede a eliminar.
-    $.ajax({
-      url: DATAREQUEST.url + `/${id}`,
-      type: "DELETE",
-      dataType: DATAREQUEST.dataType,
-      contentType: DATAREQUEST.contentType,
-      statusCode: {
-        204: function () {
-          alert("Se elimino cloud exitosamente");
-          traerDatos();
+async function eliminar(id) {
+  const cloud = await $.ajax({
+    url: DATAREQUEST.url + `/${id}`,
+    type: "GET",
+    contentType: DATAREQUEST.contentType,
+  });
+  try {
+    if (cloud.messages.length !== 0) throw "La nube no debe tener mensajes relacionados";
+    if (cloud.reservations.length !== 0) throw "La nube no debe tener relaciones con reservas";
+    const r = confirm("Segur@ de eliminar la Cloud"); // Se pregunta si está seguro de eliminar.
+    if (r == true) {
+      $.ajax({
+        url: DATAREQUEST.url + `/${id}`,
+        type: "DELETE",
+        dataType: DATAREQUEST.dataType,
+        contentType: DATAREQUEST.contentType,
+        statusCode: {
+          204: function () {
+            alert("Se elimino cloud exitosamente");
+            traerDatos();
+          },
         },
-      },
-      error: function () {
-        alert("Error en eliminar cloud");
-      },
-    });
+        error: function () {
+          alert("Error en eliminar cloud");
+        },
+      });
+    }
+  } catch (error) {
+    alert(`Error en usuario: ${error}`);
   }
 }
 

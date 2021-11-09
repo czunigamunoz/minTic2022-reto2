@@ -95,7 +95,7 @@ async function obtenerElemento(id) {
 /**
  * Funcion que esconde los botones de actualizar y cancelar y vuelve a mostrar el de crear
  */
- $("#btnCancelar").click(function () {
+$("#btnCancelar").click(function () {
   limpiarCampos();
   $("#btnActualizar").hide("slow");
 });
@@ -125,9 +125,12 @@ async function traerDatos() {
  */
 $("#btnCrear").click(function crear() {
   try {
-    if (!validarCamposVacios($(".form input"))) throw "Campos no deben estar vacios";
-    if (!validarMenor45Caracteres($("#name").val())) throw "Campo name no debe tener mas de 45 caracteres";
-    if (!validarMenor250Caracteres($("#description").val())) throw "Campo description no debe tener mas de 250 caracteres";
+    if (!validarCamposVacios($(".form input")))
+      throw "Campos no deben estar vacios";
+    if (!validarMenor45Caracteres($("#name").val()))
+      throw "Campo name no debe tener mas de 45 caracteres";
+    if (!validarMenor250Caracteres($("#description").val()))
+      throw "Campo description no debe tener mas de 250 caracteres";
     const newData = obtenerCampos();
     const data = {
       name: newData.name,
@@ -151,7 +154,7 @@ $("#btnCrear").click(function crear() {
       },
     });
   } catch (error) {
-    alert(`Error en usuario: ${error}`); 
+    alert(`Error en usuario: ${error}`);
   }
 });
 
@@ -160,9 +163,12 @@ $("#btnCrear").click(function crear() {
  */
 $("#btnActualizar").click(function actualizar() {
   try {
-    if (!validarCamposVacios($(".form input"))) throw "Campos no deben estar vacios";
-    if (!validarMenor45Caracteres($("#name").val())) throw "Campo name no debe tener mas de 45 caracteres";
-    if (!validarMenor250Caracteres($("#description").val())) throw "Campo description no debe tener mas de 250 caracteres";
+    if (!validarCamposVacios($(".form input")))
+      throw "Campos no deben estar vacios";
+    if (!validarMenor45Caracteres($("#name").val()))
+      throw "Campo name no debe tener mas de 45 caracteres";
+    if (!validarMenor250Caracteres($("#description").val()))
+      throw "Campo description no debe tener mas de 250 caracteres";
     const dataCategory = obtenerCampos();
     const data = {
       id: ID_CATEGORY,
@@ -187,7 +193,7 @@ $("#btnActualizar").click(function actualizar() {
       },
     });
   } catch (error) {
-    alert(`Error en usuario: ${error}`); 
+    alert(`Error en usuario: ${error}`);
   }
 });
 
@@ -195,24 +201,34 @@ $("#btnActualizar").click(function actualizar() {
  * Funcion para eliminar dato de CLOUD
  * @param {id} id del elemento a eliminar
  */
-function eliminar(id) {
-  const r = confirm("Segur@ de eliminar la categoria"); // Se pregunta si está seguro de eliminar.
-  if (r == true) {
-    //Si está seguro, se procede a eliminar.
-    $.ajax({
-      url: DATAREQUEST.url + `/${id}`,
-      type: "DELETE",
-      dataType: DATAREQUEST.dataType,
-      contentType: DATAREQUEST.contentType,
-      statusCode: {
-        204: function () {
-          traerDatos();
+async function eliminar(id) {
+  const category = await $.ajax({
+    url: DATAREQUEST.url + `/${id}`,
+    type: "GET",
+    contentType: DATAREQUEST.contentType,
+  });
+  try {
+    if (category.clouds.length !== 0) throw "Ninguna nube debe pertenecer a la categoria a borrar";
+    const r = confirm("Segur@ de eliminar la categoria"); // Se pregunta si está seguro de eliminar.
+    if (r == true) {
+      //Si está seguro, se procede a eliminar.
+      $.ajax({
+        url: DATAREQUEST.url + `/${id}`,
+        type: "DELETE",
+        dataType: DATAREQUEST.dataType,
+        contentType: DATAREQUEST.contentType,
+        statusCode: {
+          204: function () {
+            traerDatos();
+          },
         },
-      },
-      error: function () {
-        alert("Error en eliminar category");
-      },
-    });
+        error: function () {
+          alert("Error en eliminar category");
+        },
+      });
+    }
+  } catch (error) {
+    alert(`Error en usuario: ${error}`);
   }
 }
 
