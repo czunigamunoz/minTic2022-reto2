@@ -1,3 +1,8 @@
+/**
+ * Funcion que valida si hay campos vacios
+ * @param {Array} campos Inputs a validar
+ * @returns Boolean
+ */
 function validarCamposVacios(campos) {
   for (let index = 0; index < campos.length; index++) {
     if (campos[index].value === "") {
@@ -7,26 +12,56 @@ function validarCamposVacios(campos) {
   return true;
 }
 
+/**
+ * Funcion que valida si el largo de un texto es menor a 45 caracteres
+ * @param {String} texto 
+ * @returns Boolean
+ */
 function validarMenor45Caracteres(texto) {
   return texto.length <= 45;
 }
 
+/**
+ * Funcion que valida si el largo de un texto es menor a 250 caracteres
+ * @param {String} texto 
+ * @returns Boolean
+ */
 function validarMenor250Caracteres(texto) {
   return texto.length <= 250;
 }
 
+/**
+ * Funcion que valida dado un string si su largo es exactamente 4 caracteres
+ * @param {String} anio 
+ * @returns Boolean
+ */
 function validarAnio(anio) {
   return anio.length === 4;
 }
 
+/**
+ * Funcion que valida si una entrada es un numero entero
+ * @param {String} entrada 
+ * @returns Boolean
+ */
 function validarCampoNumerico(entrada) {
   return Number.isInteger(entrada);
 }
 
+/**
+ * Funcion que valida si una entrada esta en el rango entre 0 y 120
+ * @param {Number} entrada 
+ * @returns Boolean
+ */
 function validarCampoEdad(entrada) {
   return entrada > 0 && entrada < 120;
 }
 
+/**
+ * Funcion que valida si una entrada esta en el rango entre 0 y 5
+ * @param {Number} calificacion 
+ * @returns 
+ */
 function validarCalificacion(calificacion) {
   return calificacion >= 0 && calificacion <= 5;
 }

@@ -4,6 +4,9 @@ const DATAREQUEST = {
     contentType: "application/json; charset=utf-8",
 };
 
+/**
+ * Funcion que genera un reporte de reservaciones dadas dos fechas
+ */
 $("#btnByDate").click(function () {
     try {
         if (!validarFecha($("#startDate").val(), $("#endDate").val())) throw "La fecha de inicio debe ser anterior a la final";
@@ -27,6 +30,9 @@ $("#btnByDate").click(function () {
     }
 });
 
+/**
+ * Funcion que genera un reporte de reservaciones por el estado
+ */
 $("#btnByStatus").click(function () {
     $.ajax({
         url: DATAREQUEST.url + "/report-status",
@@ -48,6 +54,9 @@ $("#btnByStatus").click(function () {
     });
 });
 
+/**
+ * Funcion que genera un reporte de los clientes con mas reservaciones completadas
+ */
 $("#btnTopClients").click(function () {
     $.ajax({
         url: DATAREQUEST.url + "/report-clients",

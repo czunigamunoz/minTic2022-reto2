@@ -391,6 +391,10 @@ function eliminar(id) {
   }
 }
 
+/**
+ * Funcion para crear una calificacion a una reservacion
+ * @param {Numer} id de la reservacion
+ */
 function crearScore(id) {
   const data = {
     messageText: $(`#scoreMessage${id}`).val(),
@@ -421,6 +425,11 @@ function crearScore(id) {
   }
 }
 
+/**
+ * Funcion para actualizar la calificacion de una reservacion
+ * @param {Number} idScore id de la calificacion
+ * @param {Number} idReservation id de la reservacion
+ */
 function actualizarScore(idScore, idReservation){
   const data = {
     idScore: idScore,
