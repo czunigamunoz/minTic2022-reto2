@@ -32,6 +32,16 @@ function validarCalificacion(calificacion) {
 }
 
 /**
+ * Funcion para validar la fecha
+ * @param {Date} date1 Fecha de inicio
+ * @param {Date} date2 Fecha final
+ * @returns True si date2 es posterior a date1
+ */
+ function validarFecha(date1, date2) {
+  return new Date(date2) >= new Date(date1);
+}
+
+/**
  * Funcion que trae todos los elementos de la tabla CATEGORY
  * y los pinta en el select de category
  */
