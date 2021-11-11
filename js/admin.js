@@ -1,5 +1,5 @@
 const DATAREQUEST = {
-  url: "http://localhost:8080/api/Admin",
+  url: "http://132.226.251.239:8080/api/Admin",
   dataType: "json",
   contentType: "application/json; charset=utf-8",
 };
