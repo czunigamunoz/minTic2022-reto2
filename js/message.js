@@ -1,10 +1,10 @@
 const DATAREQUEST = {
-  url: "http://localhost:8080/api/Message",
+  url: "http://132.226.251.239:8080/api/Message",
   dataType: "json",
   contentType: "application/json; charset=utf-8",
 };
-const URL_CLOUD = "http://localhost:8080/api/Cloud/all";
-const URL_CLIENT = "http://localhost:8080/api/Client/all";
+const URL_CLOUD = "http://132.226.251.239:8080/api/Cloud/all";
+const URL_CLIENT = "http://132.226.251.239:8080/api/Client/all";
 let ID_MESSAGE = null;
 
 /**

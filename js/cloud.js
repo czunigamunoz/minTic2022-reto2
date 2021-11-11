@@ -1,9 +1,9 @@
 const DATAREQUEST = {
-  url: "http://localhost:8080/api/Cloud",
+  url: "http://132.226.251.239:8080/api/Cloud",
   dataType: "json",
   contentType: "application/json; charset=utf-8",
 };
-URL_CATEGORY = "http://localhost:8080/api/Category/all";
+URL_CATEGORY = "http://132.226.251.239:8080/api/Category/all";
 let ID_CLOUD = null;
 
 /**

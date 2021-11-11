@@ -1,11 +1,11 @@
 const DATAREQUEST = {
-  url: "http://localhost:8080/api/Reservation",
+  url: "http://132.226.251.239:8080/api/Reservation",
   dataType: "json",
   contentType: "application/json; charset=utf-8",
 };
-const URL_CLOUD = "http://localhost:8080/api/Cloud/all";
-const URL_CLIENT = "http://localhost:8080/api/Client/all";
-const URL_SCORE = "http://localhost:8080/api/Score";
+const URL_CLOUD = "http://132.226.251.239:8080/api/Cloud/all";
+const URL_CLIENT = "http://132.226.251.239:8080/api/Client/all";
+const URL_SCORE = "http://132.226.251.239:8080/api/Score";
 let ID_RESERVATION = null;
 
 /**
