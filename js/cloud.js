@@ -144,7 +144,7 @@ async function traerDatos() {
     $("#btnActualizar").hide();
     $("#btnCancelar").hide();
   } catch (error) {
-    alert(`Hubo un problema trayendo los datos, Error: ${error.message}`);
+    console.error(`Hubo un problema trayendo los datos, Error: ${error.message}`);
   }
 }
 
